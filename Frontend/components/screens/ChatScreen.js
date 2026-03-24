@@ -20,14 +20,13 @@ export default function ChatScreen() {
     setMessage("");
 
     try {
-      const res = await fetch(
-        "https://titanai-production.up.railway.app/chat",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message }),
-        }
-      );
+      const res = await fetch("https://titanai-backend-1hnb.onrender.com/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message }),
+      });
 
       const data = await res.json();
       setChat((prev) => [...prev, { sender: "ai", text: data.reply }]);
