@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "TitanAI",
+    "slug": "titan-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "userInterfaceStyle": "automatic",
+    "android": {
+      "package": "com.titan_69.titanai",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#000000"
+      }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7471d372-7fad-49e1-8b6d-077058f66238"
+      }
+    }
+  }
+}
