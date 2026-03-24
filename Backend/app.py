@@ -12,8 +12,8 @@ def home():
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
-    msg = data.get("message", "")
-    return jsonify({"reply": f"Titan AI says: {msg}"})
+    reply = f"You said: {msg}. I'm Titan AI 🤖"
+    return jsonify({"reply": reply})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
