@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { ThemeContext } from "../components/ThemeContext";
+import ChatBubble from "../components/ChatBubbles";
 import {
   FlatList,
   StyleSheet,
@@ -7,8 +9,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 export default function ChatScreen() {
+  const { theme } = useContext(ThemeContext);
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
 
@@ -39,21 +41,18 @@ export default function ChatScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Titan AI 🤖</Text>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
+      <Text style={[styles.header, { color: theme.text }]}>Titan AI 🤖</Text>
 
       <FlatList
         data={chat}
         keyExtractor={(_, i) => i.toString()}
         renderItem={({ item }) => (
-          <View
-            style={[
-              styles.bubble,
-              item.sender === "user" ? styles.user : styles.ai,
-            ]}
-          >
-            <Text style={styles.text}>{item.text}</Text>
-          </View>
+          <ChatBubble
+            text={item.text}
+            isUser={item.sender === "user"}
+            theme={theme}
+          />
         )}
       />
 
@@ -65,7 +64,10 @@ export default function ChatScreen() {
           value={message}
           onChangeText={setMessage}
         />
-        <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
+        <TouchableOpacity
+          style={[styles.sendBtn, { backgroundColor: theme.userBubble }]}
+          onPress={sendMessage}
+        >
           <Text style={{ color: "#fff" }}>Send</Text>
         </TouchableOpacity>
       </View>
