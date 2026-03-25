@@ -13,6 +13,11 @@
         "backgroundColor": "#000000"
       }
     },
+    "web": {
+      "build": {
+        "output": "web-build"
+      }
+    },
     "extra": {
       "eas": {
         "projectId": "7471d372-7fad-49e1-8b6d-077058f66238"
