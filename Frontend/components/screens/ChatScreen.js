@@ -22,7 +22,7 @@ export default function ChatScreen() {
     setMessage("");
 
     try {
-      const res = await fetch("https://titanai-backend-1hnb.onrender.com/chat", {
+      const res = await fetch("https://titanai-backend-1hnb.onrender.com", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
