@@ -15,7 +15,7 @@ export default function Index() {
   const [chat, setChat] = useState([
     {
       id: "1",
-      text: "Hey there! I'm TITAN AI 🚀",
+      text: "Hello 👋 I’m Titan Ai. Ask me anything.",
       isUser: false,
     },
   ]);
@@ -68,7 +68,7 @@ export default function Index() {
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.surface }]}>
         <Text style={[styles.headerText, { color: theme.text }]}>
-          TITAN AI ✨
+          TITAN Ai
         </Text>
 
         <TouchableOpacity onPress={() => setDark(!dark)}>
