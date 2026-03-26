@@ -15,7 +15,7 @@ export default function Index() {
   const [chat, setChat] = useState([
     {
       id: "1",
-      text: "Hello 👋 I’m Titan Ai. Ask me anything.",
+      text: "Hey there! I'm TITAN AI 🚀",
       isUser: false,
     },
   ]);
@@ -49,10 +49,10 @@ export default function Index() {
 
   const theme = dark
     ? {
-        bg: "#292929",
-        surface: "#a2a2a4",
-        user: "#6a6a6a",
-        bot: "#6a6a6a",
+        bg: "#0f0f23",
+        surface: "#1a1a2e",
+        user: "#e94560",
+        bot: "#222244",
         text: "#ffffff",
       }
     : {
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   },
 
   sendBtn: {
-    backgroundColor: "#575454",
+    backgroundColor: "#e94560",
     width: 44,
     height: 44,
     borderRadius: 22,
