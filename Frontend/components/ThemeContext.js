@@ -6,7 +6,7 @@ export const ThemeProvider = ({ children }) => {
   const [dark, setDark] = useState(true);
 
   const theme = {
-    background: dark ? "#0f172a" : "#f8fafc",
+    background: "yellow",
     userBubble: dark ? "#2563eb" : "#3b82f6",
     aiBubble: dark ? "#1e293b" : "#e5e7eb",
     text: dark ? "#ffffff" : "#000000",
