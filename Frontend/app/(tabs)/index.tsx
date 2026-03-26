@@ -15,7 +15,7 @@ export default function Index() {
   const [chat, setChat] = useState([
     {
       id: "1",
-      text: "Hello 👋 I’m TITAN AI. Ask me anything.",
+      text: "Hello 👋 I’m Titan Ai. Ask me anything.",
       isUser: false,
     },
   ]);
@@ -64,7 +64,7 @@ export default function Index() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>TITAN AI ✨</Text>
+        <Text style={styles.headerTitle}>TITAN AI</Text>
       </View>
 
       <FlatList
@@ -95,7 +95,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   main: {
     flex: 1,
-    backgroundColor: "#0b1120",
+    backgroundColor: "#3f4043",
   },
 
   header: {
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
     alignItems: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "#1e293b",
+    borderBottomColor: "#0e0e0e",
   },
 
   headerTitle: {
@@ -126,13 +126,13 @@ const styles = StyleSheet.create({
   },
 
   userBubble: {
-    backgroundColor: "#2563eb",
+    backgroundColor: "#787b82",
     alignSelf: "flex-end",
     borderBottomRightRadius: 5,
   },
 
   aiBubble: {
-    backgroundColor: "#1e293b",
+    backgroundColor: "#787b82",
     alignSelf: "flex-start",
     borderBottomLeftRadius: 5,
   },
@@ -147,14 +147,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 10,
     borderTopWidth: 1,
-    borderTopColor: "#1e293b",
-    backgroundColor: "#0f172a",
+    borderTopColor: "#2e2f31",
+    backgroundColor: "#353639",
     alignItems: "center",
   },
 
   input: {
     flex: 1,
-    backgroundColor: "#1e293b",
+    backgroundColor: "#3e3e3e",
     color: "#fff",
     borderRadius: 20,
     paddingHorizontal: 15,
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
 
   sendBtn: {
     marginLeft: 8,
-    backgroundColor: "#2563eb",
+    backgroundColor: "#454545",
     width: 46,
     height: 46,
     borderRadius: 23,
