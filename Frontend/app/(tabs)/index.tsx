@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 10,
     gap: 8,
+    marginTop: 10,
     marginBottom: 8,
   },
 
