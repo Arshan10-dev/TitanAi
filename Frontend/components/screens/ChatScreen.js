@@ -42,7 +42,9 @@ export default function ChatScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Text style={[styles.header, { color: theme.text }]}>Titan AI 🤖</Text>
+      <Text style={[styles.header, { color: "red", fontSize: 40 }]}>
+        TITAN TEST
+      </Text>
 
       <FlatList
         data={chat}
