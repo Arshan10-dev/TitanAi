@@ -6,11 +6,11 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
+  SafeAreaView,
 } from "react-native";
 
 export default function Index() {
+  const [dark, setDark] = useState(true);
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([
     {
@@ -25,13 +25,13 @@ export default function Index() {
   const sendMessage = () => {
     if (!message.trim()) return;
 
-    const newMessage = {
+    const userMsg = {
       id: Date.now().toString(),
       text: message,
       isUser: true,
     };
 
-    setChat((prev) => [...prev, newMessage]);
+    setChat((prev) => [...prev, userMsg]);
     setMessage("");
 
     setTimeout(() => {
@@ -44,137 +44,145 @@ export default function Index() {
         },
       ]);
       flatListRef.current?.scrollToEnd({ animated: true });
-    }, 500);
+    }, 700);
   };
 
-  const renderItem = ({ item }: any) => (
-    <View
-      style={[
-        styles.bubble,
-        item.isUser ? styles.userBubble : styles.aiBubble,
-      ]}
-    >
-      <Text style={styles.bubbleText}>{item.text}</Text>
-    </View>
-  );
+  const theme = dark
+    ? {
+        bg: "#292929",
+        surface: "#a2a2a4",
+        user: "#6a6a6a",
+        bot: "#6a6a6a",
+        text: "#ffffff",
+      }
+    : {
+        bg: "#f3f4f6",
+        surface: "#ffffff",
+        user: "#e94560",
+        bot: "#dbeafe",
+        text: "#111827",
+      };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.main}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>TITAN AI</Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.bg }]}>
+      {/* Header */}
+      <View style={[styles.header, { backgroundColor: theme.surface }]}>
+        <Text style={[styles.headerText, { color: theme.text }]}>
+          TITAN AI ✨
+        </Text>
+
+        <TouchableOpacity onPress={() => setDark(!dark)}>
+          <Text style={{ color: theme.text, fontSize: 18 }}>
+            {dark ? "☀️" : "🌙"}
+          </Text>
+        </TouchableOpacity>
       </View>
 
+      {/* Chat */}
       <FlatList
         ref={flatListRef}
         data={chat}
         keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.chatArea}
+        contentContainerStyle={{ padding: 12 }}
+        renderItem={({ item }) => (
+          <View
+            style={[
+              styles.bubble,
+              {
+                backgroundColor: item.isUser ? theme.user : theme.bot,
+                alignSelf: item.isUser ? "flex-end" : "flex-start",
+              },
+            ]}
+          >
+            <Text style={{ color: "#fff" }}>{item.text}</Text>
+          </View>
+        )}
       />
 
-      <View style={styles.inputWrapper}>
+      {/* Suggestions */}
+      <View style={styles.suggestions}>
+        <TouchableOpacity style={[styles.tag, { backgroundColor: theme.surface }]}>
+          <Text style={{ color: theme.text }}>Tell me a joke</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.tag, { backgroundColor: theme.surface }]}>
+          <Text style={{ color: theme.text }}>Fun fact</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Input */}
+      <View style={[styles.inputArea, { backgroundColor: theme.surface }]}>
         <TextInput
           value={message}
           onChangeText={setMessage}
-          placeholder="Message TITAN..."
-          placeholderTextColor="#94a3b8"
-          style={styles.input}
+          placeholder="Type message..."
+          placeholderTextColor="#888"
+          style={[styles.input, { color: theme.text }]}
         />
 
         <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
-          <Text style={styles.sendText}>➤</Text>
+          <Text style={{ color: "#fff", fontSize: 18 }}>➤</Text>
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  main: {
+  container: {
     flex: 1,
-    backgroundColor: "#3f4043",
   },
 
   header: {
-    paddingTop: 50,
-    paddingBottom: 15,
+    padding: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#0e0e0e",
   },
 
-  headerTitle: {
-    color: "#f8fafc",
-    fontSize: 22,
+  headerText: {
+    fontSize: 20,
     fontWeight: "700",
-    letterSpacing: 1,
-  },
-
-  chatArea: {
-    padding: 12,
-    paddingBottom: 20,
   },
 
   bubble: {
-    maxWidth: "80%",
-    padding: 13,
-    borderRadius: 18,
+    padding: 12,
     marginVertical: 6,
+    borderRadius: 16,
+    maxWidth: "80%",
   },
 
-  userBubble: {
-    backgroundColor: "#787b82",
-    alignSelf: "flex-end",
-    borderBottomRightRadius: 5,
+  suggestions: {
+    flexDirection: "row",
+    gap: 8,
+    paddingHorizontal: 12,
+    marginBottom: 8,
   },
 
-  aiBubble: {
-    backgroundColor: "#787b82",
-    alignSelf: "flex-start",
-    borderBottomLeftRadius: 5,
+  tag: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 18,
   },
 
-  bubbleText: {
-    color: "#ffffff",
-    fontSize: 15,
-    lineHeight: 21,
-  },
-
-  inputWrapper: {
+  inputArea: {
     flexDirection: "row",
     padding: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#2e2f31",
-    backgroundColor: "#353639",
     alignItems: "center",
   },
 
   input: {
     flex: 1,
-    backgroundColor: "#3e3e3e",
-    color: "#fff",
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    height: 46,
-    fontSize: 15,
+    paddingHorizontal: 12,
+    height: 44,
   },
 
   sendBtn: {
-    marginLeft: 8,
-    backgroundColor: "#454545",
-    width: 46,
-    height: 46,
-    borderRadius: 23,
+    backgroundColor: "#575454",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: "center",
     alignItems: "center",
-  },
-
-  sendText: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "700",
   },
 });
