@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
-import { ThemeContext } from "../components/ThemeContext";
-import ChatBubble from "../components/ChatBubbles";
+import { ThemeContext } from "../ThemeContext";
+import ChatBubble from "../ChatBubbles";
 import {
   FlatList,
   StyleSheet,
@@ -42,7 +42,9 @@ export default function ChatScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      <Text style={[styles.header, { color: theme.text }]}>Titan AI 🤖</Text>
+      <Text style={[styles.header, { color: "red", fontSize: 40 }]}>
+        TITAN TEST
+      </Text>
 
       <FlatList
         data={chat}
@@ -76,7 +78,7 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#0f172a", paddingTop: 40 },
+  container: { flex: 1, backgroundColor: "#d0ea0b", paddingTop: 40 },
   header: {
     color: "#38bdf8",
     fontSize: 22,
