@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
-import { ThemeContext } from "../components/ThemeContext";
-import ChatBubble from "../components/ChatBubbles";
+import { ThemeContext } from "../ThemeContext";
+import ChatBubble from "../ChatBubbles";
+
 import {
   FlatList,
   StyleSheet,
