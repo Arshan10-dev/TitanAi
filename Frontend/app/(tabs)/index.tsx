@@ -15,12 +15,38 @@ export default function Index() {
   const [chat, setChat] = useState([
     {
       id: "1",
-      text: "Hello 👋 I’m Titan Ai. Ask me anything.",
+      text: "Hello 👋 I’m TITAN AI. Ask me anything.",
       isUser: false,
     },
   ]);
 
+  const [history] = useState([
+    "How are you?",
+    "Tell me a joke",
+    "What is AI?",
+  ]);
+
   const flatListRef = useRef<FlatList>(null);
+
+  const theme = dark
+    ? {
+        bg: "#212121",
+        surface: "#2f2f2f",
+        input: "#303030",
+        user: "#2b6de9",
+        ai: "#2a2a2a",
+        text: "#ffffff",
+        sub: "#9ca3af",
+      }
+    : {
+        bg: "#f7f7f8",
+        surface: "#ececf1",
+        input: "#ffffff",
+        user: "#2b6de9",
+        ai: "#ffffff",
+        text: "#111827",
+        sub: "#6b7280",
+      };
 
   const sendMessage = () => {
     if (!message.trim()) return;
@@ -39,43 +65,38 @@ export default function Index() {
         ...prev,
         {
           id: Date.now().toString() + "ai",
-          text: "Thinking... 🤖",
+          text: "This is AI response ✨",
           isUser: false,
         },
       ]);
-      flatListRef.current?.scrollToEnd({ animated: true });
-    }, 700);
-  };
 
-  const theme = dark
-    ? {
-        bg: "#0f0f23",
-        surface: "#1a1a2e",
-        user: "#e94560",
-        bot: "#222244",
-        text: "#ffffff",
-      }
-    : {
-        bg: "#f3f4f6",
-        surface: "#ffffff",
-        user: "#e94560",
-        bot: "#dbeafe",
-        text: "#111827",
-      };
+      flatListRef.current?.scrollToEnd({ animated: true });
+    }, 800);
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.bg }]}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: theme.surface }]}>
-        <Text style={[styles.headerText, { color: theme.text }]}>
-          TITAN Ai
-        </Text>
+        <Text style={[styles.title, { color: theme.text }]}>TITAN AI</Text>
 
         <TouchableOpacity onPress={() => setDark(!dark)}>
           <Text style={{ color: theme.text, fontSize: 18 }}>
             {dark ? "☀️" : "🌙"}
           </Text>
         </TouchableOpacity>
+      </View>
+
+      {/* History */}
+      <View style={styles.historyRow}>
+        {history.map((item, index) => (
+          <View
+            key={index}
+            style={[styles.historyTag, { backgroundColor: theme.surface }]}
+          >
+            <Text style={{ color: theme.sub, fontSize: 12 }}>{item}</Text>
+          </View>
+        ))}
       </View>
 
       {/* Chat */}
@@ -89,35 +110,36 @@ export default function Index() {
             style={[
               styles.bubble,
               {
-                backgroundColor: item.isUser ? theme.user : theme.bot,
+                backgroundColor: item.isUser ? theme.user : theme.ai,
                 alignSelf: item.isUser ? "flex-end" : "flex-start",
               },
             ]}
           >
-            <Text style={{ color: "#fff" }}>{item.text}</Text>
+            <Text
+              style={{
+                color: item.isUser ? "#fff" : theme.text,
+              }}
+            >
+              {item.text}
+            </Text>
           </View>
         )}
       />
 
-      {/* Suggestions */}
-      <View style={styles.suggestions}>
-        <TouchableOpacity style={[styles.tag, { backgroundColor: theme.surface }]}>
-          <Text style={{ color: theme.text }}>Tell me a joke</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={[styles.tag, { backgroundColor: theme.surface }]}>
-          <Text style={{ color: theme.text }}>Fun fact</Text>
-        </TouchableOpacity>
-      </View>
-
       {/* Input */}
-      <View style={[styles.inputArea, { backgroundColor: theme.surface }]}>
+      <View style={[styles.inputWrap, { backgroundColor: theme.surface }]}>
         <TextInput
           value={message}
           onChangeText={setMessage}
-          placeholder="Type message..."
-          placeholderTextColor="#888"
-          style={[styles.input, { color: theme.text }]}
+          placeholder="Message TITAN..."
+          placeholderTextColor={theme.sub}
+          style={[
+            styles.input,
+            {
+              backgroundColor: theme.input,
+              color: theme.text,
+            },
+          ]}
         />
 
         <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
@@ -134,15 +156,28 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    padding: 16,
+    padding: 15,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
 
-  headerText: {
+  title: {
     fontSize: 20,
     fontWeight: "700",
+  },
+
+  historyRow: {
+    flexDirection: "row",
+    paddingHorizontal: 10,
+    gap: 8,
+    marginBottom: 8,
+  },
+
+  historyTag: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 14,
   },
 
   bubble: {
@@ -152,20 +187,7 @@ const styles = StyleSheet.create({
     maxWidth: "80%",
   },
 
-  suggestions: {
-    flexDirection: "row",
-    gap: 8,
-    paddingHorizontal: 12,
-    marginBottom: 8,
-  },
-
-  tag: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 18,
-  },
-
-  inputArea: {
+  inputWrap: {
     flexDirection: "row",
     padding: 10,
     alignItems: "center",
@@ -173,16 +195,18 @@ const styles = StyleSheet.create({
 
   input: {
     flex: 1,
+    height: 46,
+    borderRadius: 14,
     paddingHorizontal: 12,
-    height: 44,
   },
 
   sendBtn: {
-    backgroundColor: "#e94560",
     width: 44,
     height: 44,
     borderRadius: 22,
+    backgroundColor: "#2b6de9",
     justifyContent: "center",
     alignItems: "center",
+    marginLeft: 8,
   },
 });
