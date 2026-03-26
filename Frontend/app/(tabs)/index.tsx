@@ -64,12 +64,12 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0f172a",
+    backgroundColor: "#2d2e30",
     paddingTop: 50,
     paddingHorizontal: 10,
   },
   header: {
-    color: "#38bdf8",
+    color: "#f5fafc",
     fontSize: 22,
     textAlign: "center",
     marginBottom: 15,
@@ -103,9 +103,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   sendBtn: {
-    backgroundColor: "#2563eb",
+    backgroundColor: "#d9dde5",
     marginLeft: 8,
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
     justifyContent: "center",
     borderRadius: 10,
   },
