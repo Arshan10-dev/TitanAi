@@ -133,7 +133,98 @@ const FONT = {
 // ─── Mock Data ────────────────────────────────────────────────────────────────
 
 const AI_RESPONSES = [
-  " "
+  "Sure — here's a Java student management example:\n\n" +
+  "import java.util.Scanner;\n\n" +
+  "class Student {\n" +
+  "    int rollNo;\n" +
+  "    String name;\n" +
+  "    double marks;\n\n" +
+  "    Student(int rollNo, String name, double marks) {\n" +
+  "        this.rollNo = rollNo;\n" +
+  "        this.name = name;\n" +
+  "        this.marks = marks;\n" +
+  "    }\n\n" +
+  "    void display() {\n" +
+  "        System.out.println(\"Roll No: \" + rollNo);\n" +
+  "        System.out.println(\"Name: \" + name);\n" +
+  "        System.out.println(\"Marks: \" + marks);\n" +
+  "        System.out.println(\"----------------------\");\n" +
+  "    }\n" +
+  "}\n\n" +
+  "public class StudentManagement {\n" +
+  "    public static void main(String[] args) {\n" +
+  "        Scanner sc = new Scanner(System.in);\n" +
+  "        Student[] students = new Student[3];\n\n" +
+  "        for (int i = 0; i < 3; i++) {\n" +
+  "            System.out.println(\"Enter details for Student \" + (i + 1));\n" +
+  "            System.out.print(\"Roll No: \");\n" +
+  "            int roll = sc.nextInt();\n" +
+  "            sc.nextLine();\n\n" +
+  "            System.out.print(\"Name: \");\n" +
+  "            String name = sc.nextLine();\n\n" +
+  "            System.out.print(\"Marks: \");\n" +
+  "            double marks = sc.nextDouble();\n\n" +
+  "            students[i] = new Student(roll, name, marks);\n" +
+  "        }\n\n" +
+  "        System.out.println(\"\\nStudent Details:\");\n" +
+  "        for (int i = 0; i < 3; i++) {\n" +
+  "            students[i].display();\n" +
+  "        }\n\n" +
+  "        Student topper = students[0];\n\n" +
+  "        for (int i = 1; i < 3; i++) {\n" +
+  "            if (students[i].marks > topper.marks) {\n" +
+  "                topper = students[i];\n" +
+  "            }\n" +
+  "        }\n\n" +
+  "        System.out.println(\"Topper Student:\");\n" +
+  "        topper.display();\n\n" +
+  "        sc.close();\n" +
+  "    }\n" +
+  "}" +
+  "Here’s a clean Germany trip plan\n\n" +
+  "Germany Trip Plan\n\n" +
+  "Duration:\n" +
+  "7 Days / 6 Nights\n\n" +
+  "Best Time to Visit:\n" +
+  "April to June or September to October because the weather is pleasant and cities are beautiful.\n\n" +
+  "Day 1 – Arrival in Berlin\n" +
+  "• Arrive in Berlin\n" +
+  "• Check in to hotel\n" +
+  "• Visit Brandenburg Gate\n" +
+  "• Explore Alexanderplatz\n" +
+  "• Evening walk near Berlin Cathedral\n\n" +
+  "Day 2 – Berlin Sightseeing\n" +
+  "• Visit Berlin Wall Memorial\n" +
+  "• Explore Museum Island\n" +
+  "• Try German street food like Currywurst\n\n" +
+  "Day 3 – Travel to Munich\n" +
+  "• Travel to Munich by train\n" +
+  "• Visit Marienplatz\n" +
+  "• Explore local markets\n" +
+  "• Evening at English Garden\n\n" +
+  "Day 4 – Munich Attractions\n" +
+  "• Visit Nymphenburg Palace\n" +
+  "• Explore BMW Museum\n" +
+  "• Taste Bavarian food\n\n" +
+  "Day 5 – Day Trip to Neuschwanstein Castle\n" +
+  "• Visit Neuschwanstein Castle\n" +
+  "• Enjoy mountain views and photography\n\n" +
+  "Day 6 – Visit Frankfurt\n" +
+  "• Travel to Frankfurt\n" +
+  "• Visit Römer\n" +
+  "• Walk near Main Tower\n\n" +
+  "Day 7 – Departure\n" +
+  "• Shopping for souvenirs\n" +
+  "• Return flight\n\n" +
+  "Estimated Budget:\n" +
+  "• Flights: €500–€800\n" +
+  "• Hotels: €70–€150 per night\n" +
+  "• Food: €20–€40 per day\n" +
+  "• Transport: €50–€100\n\n" +
+  "Important Tips:\n" +
+  "• Carry passport and travel insurance\n" +
+  "• Use train passes for easy travel 🚆\n" +
+  "• Learn simple German words like 'Danke' (Thank you)"
 ];
 
 const SEED_CHATS: Chat[] = [
