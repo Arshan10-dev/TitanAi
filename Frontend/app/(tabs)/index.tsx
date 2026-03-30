@@ -627,7 +627,36 @@ export default function App() {
 
         if (text.toLowerCase().includes("quantum")) {
           reply =
-            "Quantum entanglement means two particles become linked so that changing one instantly affects the other, even across huge distances.";
+            "Quantum entanglement is a phenomenon in Quantum Mechanics where two or more particles become linked in such a way that the state of one particle instantly affects the state of the other, even if they are very far apart. ⚛️✨\n\n" +
+            "Simple idea:\n" +
+            "Imagine you have two special coins:\n\n" +
+            "• If one coin lands heads, the other will always land tails.\n" +
+            "• But before you look, neither coin is fixed — both are in a mixed quantum state.\n\n" +
+            "Now suppose one coin is on Earth 🌍 and the other is on Mars 🚀.\n" +
+            "The moment you check the Earth coin and see heads, the Mars coin is instantly determined to be tails.\n\n" +
+            "That strange connection is similar to quantum entanglement.\n\n" +
+            "Why it is strange:\n" +
+            "In normal life, objects have their own separate states.\n" +
+            "But entangled particles act like one shared system, no matter how far apart they are.\n\n" +
+            "Important point:\n" +
+            "This does not mean information travels faster than light.\n" +
+            "It means the particles were described together from the start, according to quantum rules.\n\n" +
+            "Real example:\n" +
+            "Scientists often entangle:\n" +
+            "• photons (light particles)\n" +
+            "• electrons\n" +
+            "• atoms\n\n" +
+            "These are used in:\n" +
+            "• quantum computers 💻\n" +
+            "• ultra-secure communication 🔐\n" +
+            "• advanced physics experiments 🧪\n\n" +
+            "Famous reaction:\n" +
+            "Albert Einstein called it 'spooky action at a distance' because it seemed so weird.\n\n" +
+            "One-line summary:\n" +
+            "Entanglement means particles share a connected quantum state\n" +
+            "so measuring one immediately relates to the other.\n" +
+            "If you want, I can also explain why Einstein disliked it,\n" +
+            "how it is proven experimentally, or in very easy 10th-class style.\n"
         }
         else if (text.toLowerCase().includes("java")) {
           reply =
@@ -680,18 +709,18 @@ export default function App() {
             "    }\n" +
             "}" +
             "Which topic have been covered :" +
-            "   Class & Object ✅" +
-            "   Constructor ✅" +
-            "   Array of Objects ✅" +
-            "   Loop ✅" +
-            "   Scanner Input ✅" +
-            "   Condition(if) ✅" +
+            "   • Class & Object ✅" +
+            "   • Constructor ✅" +
+            "   • Array of Objects ✅" +
+            "   • Loop ✅" +
+            "   • Scanner Input ✅" +
+            "   • Condition(if) ✅" +
             " " +
             "If you want then i can give you more bigger example like :" +
-            "   Bank Management System 🏦" +
-            "   Library Management System 📚" +
-            "   ATM Simulation 💳" +
-            "   Online Shopping System 🛒";
+            "  • Bank Management System 🏦" +
+            "  • Library Management System 📚" +
+            "  • ATM Simulation 💳" +
+            "  • Online Shopping System 🛒";
         }
         else if (text.toLowerCase().includes("germany")) {
           reply =
