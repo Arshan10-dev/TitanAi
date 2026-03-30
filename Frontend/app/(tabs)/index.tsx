@@ -538,7 +538,7 @@ function ChatWindow({
             <Text style={[st.emptyH, { color: t.textPrimary }]}>How can I help you today?</Text>
             <Text style={[st.emptySub, { color: t.textSecondary }]}>Ask me anything — I'm here to assist.</Text>
             <View style={st.chips}>
-              {["Explain quantum entanglement", "Write a Python script", "Plan a trip to Germany", "Summarize a concept"].map((s) => (
+              {["Explain quantum entanglement", "Write a Java Example", "Plan a trip to Germany", "Summarize a concept"].map((s) => (
                 <TouchableOpacity
                   key={s}
                   style={[st.chip, { backgroundColor: t.surface, borderColor: t.borderLight }]}
