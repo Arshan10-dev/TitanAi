@@ -83,7 +83,7 @@ const DARK: Theme = {
   borderLight: "#454545",
   accent: "#2f2f2f",
   accentDark: "#505050",
-  accentGlow: "rgba(16,163,127,0.12)",
+  accentGlow: "rgba(65, 77, 74, 0.12)",
   userBubble: "#2f2f2f",
   userBubbleBorder: "#484848",
   aiBubble: "transparent",
@@ -105,7 +105,7 @@ const LIGHT: Theme = {
   borderLight: "#d8d8d8",
   accent: "#2f2f2f",
   accentDark: "#505050",
-  accentGlow: "rgba(16,163,127,0.10)",
+  accentGlow: "rgba(66, 77, 74, 0.1)",
   userBubble: "#efefef",
   userBubbleBorder: "#e0e0e0",
   aiBubble: "transparent",
@@ -417,37 +417,12 @@ function Sidebar({
 
         {/* New chat */}
         <TouchableOpacity
-          style={[
-            st.newBtn,
-            {
-              backgroundColor: t.surface,
-              borderColor: t.border,
-            },
-          ]}
+          style={[st.newBtn, { backgroundColor: t.accentGlow, borderColor: t.accentDark }]}
           onPress={onNewChat}
           activeOpacity={0.75}
         >
-          <Text
-            style={{
-              fontSize: 18,
-              marginRight: 8,
-              lineHeight: 20,
-              color: t.textSecondary,
-            }}
-          >
-            ＋
-          </Text>
-
-          <Text
-            style={{
-              fontSize: 14,
-              fontWeight: "600",
-              fontFamily: FONT.sans,
-              color: t.textPrimary,
-            }}
-          >
-            New conversation
-          </Text>
+          <Text style={[{ fontSize: 18, marginRight: 8, lineHeight: 20 }, { color: t.accent }]}>＋</Text>
+          <Text style={[{ fontSize: 14, fontWeight: "600", fontFamily: FONT.sans }, { color: t.accent }]}>New conversation</Text>
         </TouchableOpacity>
 
         {/* Search */}
