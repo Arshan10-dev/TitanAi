@@ -654,7 +654,7 @@ export default function App() {
             "Albert Einstein called it 'spooky action at a distance' because it seemed so weird.\n\n" +
             "One-line summary:\n" +
             "Entanglement means particles share a connected quantum state\n" +
-            "so measuring one immediately relates to the other.\n" +
+            "so measuring one immediately relates to the other.\n\n" +
             "If you want, I can also explain why Einstein disliked it,\n" +
             "how it is proven experimentally, or in very easy 10th-class style.\n"
         }
@@ -714,7 +714,7 @@ export default function App() {
             "   • Array of Objects ✅\n" +
             "   • Loop ✅\n" +
             "   • Scanner Input ✅\n" +
-            "   • Condition(if) ✅\n" +
+            "   • Condition(if) ✅\n\n" +
             "If you want then i can give you more bigger example like :\n" +
             "  • Bank Management System 🏦\n" +
             "  • Library Management System 📚\n" +
@@ -780,6 +780,10 @@ export default function App() {
         ) {
           reply =
             "Hey i'm Titan Ai, how can I help you ?";
+        }
+        else if (text.toLowerCase().includes("meri")) {
+          reply =
+            "Nuzhat (Chuzzaa) 🥰🐥🎀";
         }
         else {
           reply =
