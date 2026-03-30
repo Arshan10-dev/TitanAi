@@ -631,7 +631,7 @@ export default function App() {
         }
         else if (text.toLowerCase().includes("java")) {
           reply =
-            "Sure — here's a Java student management example:\n\n" +
+            "Sure — here's a Java student management example :\n\n" +
             "import java.util.Scanner;\n\n" +
             "class Student {\n" +
             "    int rollNo;\n" +
@@ -678,11 +678,24 @@ export default function App() {
             "        topper.display();\n\n" +
             "        sc.close();\n" +
             "    }\n" +
-            "}";
+            "}" +
+            "Which topic have been covered :" +
+            "   Class & Object ✅" +
+            "   Constructor ✅" +
+            "   Array of Objects ✅" +
+            "   Loop ✅" +
+            "   Scanner Input ✅" +
+            "   Condition(if) ✅" +
+            " " +
+            "If you want then i can give you more bigger example like :" +
+            "   Bank Management System 🏦" +
+            "   Library Management System 📚" +
+            "   ATM Simulation 💳" +
+            "   Online Shopping System 🛒";
         }
         else if (text.toLowerCase().includes("germany")) {
           reply =
-            "Here’s a clean Germany trip plan\n\n" +
+            "Here’s a clean Germany trip plan :\n\n" +
             "Germany Trip Plan\n\n" +
             "Duration:\n" +
             "7 Days / 6 Nights\n\n" +
