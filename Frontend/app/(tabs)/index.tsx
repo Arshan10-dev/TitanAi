@@ -707,20 +707,19 @@ export default function App() {
             "        topper.display();\n\n" +
             "        sc.close();\n" +
             "    }\n" +
-            "}\n" +
-            "Which topic have been covered :" +
-            "   • Class & Object ✅" +
-            "   • Constructor ✅" +
-            "   • Array of Objects ✅" +
-            "   • Loop ✅" +
-            "   • Scanner Input ✅" +
-            "   • Condition(if) ✅" +
-            " " +
-            "If you want then i can give you more bigger example like :" +
-            "  • Bank Management System 🏦" +
-            "  • Library Management System 📚" +
-            "  • ATM Simulation 💳" +
-            "  • Online Shopping System 🛒";
+            "}\n\n" +
+            "Which topic have been covered :\n" +
+            "   • Class & Object ✅\n" +
+            "   • Constructor ✅\n" +
+            "   • Array of Objects ✅\n" +
+            "   • Loop ✅\n" +
+            "   • Scanner Input ✅\n" +
+            "   • Condition(if) ✅\n" +
+            "If you want then i can give you more bigger example like :\n" +
+            "  • Bank Management System 🏦\n" +
+            "  • Library Management System 📚\n" +
+            "  • ATM Simulation 💳\n" +
+            "  • Online Shopping System 🛒\n";
         }
         else if (text.toLowerCase().includes("germany")) {
           reply =
