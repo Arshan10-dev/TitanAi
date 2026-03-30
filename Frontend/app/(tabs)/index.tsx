@@ -720,7 +720,7 @@ export default function App() {
           reply =
             "Quantum entanglement means two particles become linked so that changing one instantly affects the other, even across huge distances.";
         }
-        else if (text.toLowerCase().includes("Java")) {
+        else if (text.toLowerCase().includes("java")) {
           reply =
             "Sure — here's a Java student management example:\n\n" +
             "import java.util.Scanner;\n\n" +
@@ -771,7 +771,7 @@ export default function App() {
             "    }\n" +
             "}";
         }
-        else if (text.toLowerCase().includes("japan")) {
+        else if (text.toLowerCase().includes("germany")) {
           reply =
             "Here’s a clean Germany trip plan\n\n" +
             "Germany Trip Plan\n\n" +
@@ -822,7 +822,12 @@ export default function App() {
           reply =
             "Please share the topic or text you'd like summarized, and I'll make it concise.";
         }
-        else if (text.toLowerCase().includes("Hii,hii,Hello,hello,Hey,hey")) {
+        else if (
+          text.toLowerCase().includes("hi") ||
+          text.toLowerCase().includes("hello") ||
+          text.toLowerCase().includes("hey") ||
+          text.toLowerCase().includes("hii")
+        ) {
           reply =
             "Hey i'm Titan Ai, how can I help you ?";
         }
