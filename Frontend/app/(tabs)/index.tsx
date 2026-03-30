@@ -352,7 +352,7 @@ function SettingsPanel({
           <Text style={[st.sectionLabel, { color: t.textMuted, marginTop: 26 }]}>ABOUT</Text>
           <View style={[st.aboutCard, { backgroundColor: t.surface, borderColor: t.border }]}>
             <Text style={[{ fontSize: 14, fontWeight: "700", marginBottom: 3, fontFamily: FONT.sans }, { color: t.textPrimary }]}>
-              Aether AI
+              Titan AI
             </Text>
             <Text style={[{ fontSize: 12, fontFamily: FONT.mono }, { color: t.textMuted }]}>
               Version 1.0.0 · Built with React Native
@@ -412,7 +412,7 @@ function Sidebar({
           <View style={[st.logoMark, { backgroundColor: t.accent }]}>
             <Text style={{ color: "#fff", fontSize: 13, fontWeight: "800" }}>✦</Text>
           </View>
-          <Text style={[st.logoTxt, { color: t.textPrimary }]}>Aether</Text>
+          <Text style={[st.logoTxt, { color: t.textPrimary }]}>Titan</Text>
         </View>
 
         {/* New chat */}
@@ -521,7 +521,7 @@ function ChatWindow({
           <View style={[st.headLogo, { backgroundColor: t.accent }]}>
             <Text style={{ color: "#fff", fontSize: 11, fontWeight: "800" }}>✦</Text>
           </View>
-          <Text style={[{ fontSize: 16, fontWeight: "700", fontFamily: FONT.sans }, { color: t.textPrimary }]}>Aether AI</Text>
+          <Text style={[{ fontSize: 16, fontWeight: "700", fontFamily: FONT.sans }, { color: t.textPrimary }]}>Titan AI</Text>
         </View>
         <View style={[st.badge, { backgroundColor: t.surface, borderColor: t.border }]}>
           <Text style={[{ fontSize: 11, fontWeight: "600", fontFamily: FONT.mono }, { color: t.textSecondary }]}>GPT-4</Text>
@@ -562,7 +562,7 @@ function ChatWindow({
           <View style={[st.inputRow, { backgroundColor: t.inputBg, borderColor: t.border }]}>
             <TextInput
               style={[st.input, { color: t.textPrimary, fontSize: fs }]}
-              placeholder="Message Aether..."
+              placeholder="Message Titan..."
               placeholderTextColor={t.textMuted}
               value={inputText}
               onChangeText={onInputChange}
@@ -578,7 +578,7 @@ function ChatWindow({
               <Text style={{ color: "#fff", fontSize: 18, fontWeight: "700", lineHeight: 20 }}>↑</Text>
             </TouchableOpacity>
           </View>
-          <Text style={[st.hint, { color: t.textMuted }]}>Aether can make mistakes. Consider checking important info.</Text>
+          <Text style={[st.hint, { color: t.textMuted }]}>Titan can make mistakes. Consider checking important info.</Text>
         </View>
       </KeyboardAvoidingView>
     </View>
