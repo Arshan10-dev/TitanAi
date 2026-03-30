@@ -707,7 +707,7 @@ export default function App() {
             "        topper.display();\n\n" +
             "        sc.close();\n" +
             "    }\n" +
-            "}" +
+            "}\n" +
             "Which topic have been covered :" +
             "   • Class & Object ✅" +
             "   • Constructor ✅" +
