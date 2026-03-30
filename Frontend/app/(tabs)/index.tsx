@@ -417,12 +417,37 @@ function Sidebar({
 
         {/* New chat */}
         <TouchableOpacity
-          style={[st.newBtn, { backgroundColor: t.accentGlow, borderColor: t.accentDark }]}
+          style={[
+            st.newBtn,
+            {
+              backgroundColor: t.surface,
+              borderColor: t.border,
+            },
+          ]}
           onPress={onNewChat}
           activeOpacity={0.75}
         >
-          <Text style={[{ fontSize: 18, marginRight: 8, lineHeight: 20 }, { color: t.accent }]}>＋</Text>
-          <Text style={[{ fontSize: 14, fontWeight: "600", fontFamily: FONT.sans }, { color: t.accent }]}>New conversation</Text>
+          <Text
+            style={{
+              fontSize: 18,
+              marginRight: 8,
+              lineHeight: 20,
+              color: t.textSecondary,
+            }}
+          >
+            ＋
+          </Text>
+
+          <Text
+            style={{
+              fontSize: 14,
+              fontWeight: "600",
+              fontFamily: FONT.sans,
+              color: t.textPrimary,
+            }}
+          >
+            New conversation
+          </Text>
         </TouchableOpacity>
 
         {/* Search */}
