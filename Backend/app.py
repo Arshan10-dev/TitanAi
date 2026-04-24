@@ -2,22 +2,30 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
 import os
-from dotenv import load_dotenv
-load_dotenv()
+
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
 CORS(app)
 
+# 🔹 root route (for browser test)
+@app.route("/")
+def home():
+    return "Titan AI Backend is running 🚀"
+
 @app.route("/chat", methods=["POST"])
 def chat():
-    data = request.json
-    user_message = data.get("message")
+    data = request.get_json()  # safer than request.json
+
+    if not data or "message" not in data:
+        return jsonify({"reply": "No message provided"}), 400
+
+    user_message = data["message"]
 
     response = requests.post(
         "https://api.openai.com/v1/responses",
         headers={
-            "Authorization": f"Bearer {OPENAI_API_KEY}",
+            "Authorization": f"Bearer {OPENAI_API_KEY}",  # ✅ FIXED
             "Content-Type": "application/json",
         },
         json={
@@ -28,12 +36,14 @@ def chat():
 
     result = response.json()
 
-    try:
-        reply = result["output"][0]["content"][0]["text"]
-    except:
-        reply = "Error generating response"
+    if "error" in result:
+        reply = result["error"]["message"]
+    else:
+        reply = result.get("output_text", "No response from AI")
 
     return jsonify({"reply": reply})
 
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=3000, debug=True)
+    port = int(os.environ.get("PORT", 3000))  # ✅ Render fix
+    app.run(host="0.0.0.0", port=port)
