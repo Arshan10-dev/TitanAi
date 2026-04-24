@@ -33,10 +33,12 @@ def chat():
 
     result = response.json()
 
-    try:
-        reply = result["candidates"][0]["content"]["parts"][0]["text"]
-    except:
-        reply = "Error generating response"
+    if "error" in result:
+        reply = result["error"]["message"]
+    elif "candidates" in result and len(result["candidates"]) > 0:
+        reply = result["candidates"][0]["content"]["parts"][0].get("text", "No text response")
+    else:
+        reply = "No response from Gemini"
 
     return jsonify({"reply": reply})
 
