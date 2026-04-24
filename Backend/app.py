@@ -3,47 +3,42 @@ from flask_cors import CORS
 import requests
 import os
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
 app = Flask(__name__)
 CORS(app)
 
-# 🔹 root route (for browser test)
-@app.route("/")
-def home():
-    return "Titan AI Backend is running 🚀"
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    data = request.get_json()  # safer than request.json
+    data = request.json
+    user_message = data.get("message")
 
-    if not data or "message" not in data:
-        return jsonify({"reply": "No message provided"}), 400
-
-    user_message = data["message"]
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
     response = requests.post(
-        "https://api.openai.com/v1/responses",
+        url,
         headers={
-            "Authorization": f"Bearer {OPENAI_API_KEY}",  # ✅ FIXED
-            "Content-Type": "application/json",
+            "Content-Type": "application/json"
         },
         json={
-            "model": "gpt-4.1-mini",
-            "input": user_message
+            "contents": [
+                {
+                    "parts": [
+                        {"text": user_message}
+                    ]
+                }
+            ]
         }
     )
 
     result = response.json()
 
-    if "error" in result:
-        reply = result["error"]["message"]
-    else:
-        reply = result.get("output_text", "No response from AI")
+    try:
+        reply = result["candidates"][0]["content"]["parts"][0]["text"]
+    except:
+        reply = "Error generating response"
 
     return jsonify({"reply": reply})
 
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 3000))  # ✅ Render fix
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=3000)
