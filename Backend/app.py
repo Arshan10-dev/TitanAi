@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
+import os
+from dotenv import load_dotenv
+load_dotenv()
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
 CORS(app)
-
-OPENAI_API_KEY = "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"
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -15,7 +17,7 @@ def chat():
     response = requests.post(
         "https://api.openai.com/v1/responses",
         headers={
-            "Authorization": f"Bearer {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}",
+            "Authorization": f"Bearer {OPENAI_API_KEY}",
             "Content-Type": "application/json",
         },
         json={
