@@ -6,27 +6,23 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.json
     user_message = data.get("message")
 
-    model = "gemini-2.0-flash"
-
-    url = f"https://generativelanguage.googleapis.com/v1/models/{model}:generateContent?key={GEMINI_API_KEY}"
-
     response = requests.post(
-        url,
-        headers={"Content-Type": "application/json"},
+        "https://openrouter.ai/api/v1/chat/completions",
+        headers={
+            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Content-Type": "application/json",
+        },
         json={
-            "contents": [
-                {
-                    "parts": [
-                        {"text": user_message}
-                    ]
-                }
+            "model": "openai/gpt-3.5-turbo",  # free model
+            "messages": [
+                {"role": "user", "content": user_message}
             ]
         }
     )
@@ -35,7 +31,7 @@ def chat():
     print("FULL RESPONSE:", result)
 
     try:
-        reply = result["candidates"][0]["content"]["parts"][0]["text"]
+        reply = result["choices"][0]["message"]["content"]
     except:
         reply = str(result)
 
