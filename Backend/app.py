@@ -13,7 +13,9 @@ def chat():
     data = request.json
     user_message = data.get("message")
 
-    url = f"https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key={GEMINI_API_KEY}"
+    model = "gemini-2.0-flash"
+
+    url = f"https://generativelanguage.googleapis.com/v1/models/{model}:generateContent?key={GEMINI_API_KEY}"
 
     response = requests.post(
         url,
@@ -21,7 +23,9 @@ def chat():
         json={
             "contents": [
                 {
-                    "parts": [{"text": user_message}]
+                    "parts": [
+                        {"text": user_message}
+                    ]
                 }
             ]
         }
@@ -30,9 +34,9 @@ def chat():
     result = response.json()
     print("FULL RESPONSE:", result)
 
-    if "candidates" in result:
+    try:
         reply = result["candidates"][0]["content"]["parts"][0]["text"]
-    else:
+    except:
         reply = str(result)
 
     return jsonify({"reply": reply})
