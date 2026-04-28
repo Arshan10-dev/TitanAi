@@ -637,7 +637,7 @@ export default function App() {
     setIsTyping(true);
 
     try {
-      const res = await fetch("http://192.168.0.103:5000/chat", {
+      const res = await fetch("https://titanai-backend-krkq.onrender.com", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
