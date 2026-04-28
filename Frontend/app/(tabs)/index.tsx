@@ -610,83 +610,81 @@ export default function App() {
   }, []);
 
   const handleSend = useCallback(
-  async (text: string) => {
-    if (!text.trim()) return;
+    async (text: string) => {
+      if (!text.trim()) return;
 
-    const msg: Message = {
-      id: uid(),
-      role: "user",
-      content: text,
-      timestamp: new Date(),
-    };
+      const msg: Message = {
+        id: uid(),
+        role: "user",
+        content: text,
+        timestamp: new Date(),
+      };
 
-    // user message add
-    setChats((p) =>
-      p.map((c) =>
-        c.id === activeChatId
-          ? {
+      // user message add
+      setChats((p) =>
+        p.map((c) =>
+          c.id === activeChatId
+            ? {
               ...c,
               title: c.messages.length === 0 ? trunc(text, 32) : c.title,
               messages: [...c.messages, msg],
             }
-          : c
-      )
-    );
-
-    setInputText("");
-    setIsTyping(true);
-
-    try {
-      const res = await fetch("https://titanai-backend-krkq.onrender.com", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message: text,
-        }),
-      });
-
-      const data = await res.json();
-
-      const ai: Message = {
-        id: uid(),
-        role: "assistant",
-        content: data.reply,
-        timestamp: new Date(),
-      };
-
-      // AI reply add
-      setChats((p) =>
-        p.map((c) =>
-          c.id === activeChatId
-            ? { ...c, messages: [...c.messages, ai] }
             : c
         )
       );
-    } catch (err) {
-      console.log("ERROR:", err);
 
-      const ai: Message = {
-        id: uid(),
-        role: "assistant",
-        content: "⚠️ Cannot connect to the server",
-        timestamp: new Date(),
-      };
+      setInputText("");
+      setIsTyping(true);
 
-      setChats((p) =>
-        p.map((c) =>
-          c.id === activeChatId
-            ? { ...c, messages: [...c.messages, ai] }
-            : c
-        )
-      );
-    }
+      try {
+        const res = await fetch("https://titanai-backend-krkq.onrender.com/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message: text }),
+        });
 
-    setIsTyping(false);
-  },
-  [activeChatId]
-);
+        const data = await res.json();
+
+        const ai: Message = {
+          id: uid(),
+          role: "assistant",
+          content: data.reply,
+          timestamp: new Date(),
+        };
+
+        // AI reply add
+        setChats((p) =>
+          p.map((c) =>
+            c.id === activeChatId
+              ? { ...c, messages: [...c.messages, ai] }
+              : c
+          )
+        );
+      } catch (err) {
+        console.log("ERROR:", err);
+
+        const ai: Message = {
+          id: uid(),
+          role: "assistant",
+          content: "Cannot connect to the server ⚠️",
+          timestamp: new Date(),
+        };
+
+        setChats((p) =>
+          p.map((c) =>
+            c.id === activeChatId
+              ? { ...c, messages: [...c.messages, ai] }
+              : c
+          )
+        );
+      }
+
+      setIsTyping(false);
+    },
+    [activeChatId]
+  );
 
   return (
     <ThemeCtx.Provider value={theme}>
