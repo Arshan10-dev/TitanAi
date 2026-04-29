@@ -8,23 +8,24 @@ import React, {
   useMemo,
 } from "react";
 import {
-  View,
   Text,
   TextInput,
   TouchableOpacity,
   ScrollView,
   Modal,
   StyleSheet,
-  SafeAreaView,
   StatusBar,
   Animated,
-  KeyboardAvoidingView,
-  Platform,
   Dimensions,
   Switch,
   ViewStyle,
 } from "react-native";
-
+import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  View
+} from "react-native";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface Message {
@@ -190,6 +191,7 @@ function TypingDots() {
   }, []);
 
   return (
+
     <View style={{ marginBottom: 16 }}>
       <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
         <View style={[st.aiAvatar, { backgroundColor: t.accent }]}>
@@ -216,7 +218,7 @@ function TypingDots() {
 
 // ─── MessageBubble ────────────────────────────────────────────────────────────
 
-function MessageBubble({ message }: { message: Message }) {
+function MessageBubble({ message, fontSize }: { message: Message; fontSize: number }) {
   const t = useTheme();
   const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(10)).current;
@@ -250,7 +252,7 @@ function MessageBubble({ message }: { message: Message }) {
             : { backgroundColor: t.aiBubble, borderColor: "transparent", borderBottomLeftRadius: 4 },
         ]}
       >
-        <Text style={[st.bubbleTxt, { color: t.textPrimary }]}>{message.content}</Text>
+        <Text style={[st.bubbleTxt, { color: t.textPrimary, fontSize }]}>{message.content}</Text>
         <Text style={[st.ts, { color: t.textMuted }]}>{fmtTime(message.timestamp)}</Text>
       </View>
       {isUser && (
@@ -284,8 +286,6 @@ function SettingsPanel({
 
   const rows: { label: string; sub: string; key: keyof SettingsState }[] = [
     { label: "Dark Mode", sub: "Switch between light and dark theme", key: "darkMode" },
-    { label: "Response Streaming", sub: "Stream AI replies as they generate", key: "streamingEnabled" },
-    { label: "Sound Effects", sub: "Play sounds on new messages", key: "soundEnabled" },
   ];
 
   return (
@@ -348,10 +348,10 @@ function SettingsPanel({
           <Text style={[st.sectionLabel, { color: t.textMuted, marginTop: 26 }]}>ABOUT</Text>
           <View style={[st.aboutCard, { backgroundColor: t.surface, borderColor: t.border }]}>
             <Text style={[{ fontSize: 14, fontWeight: "700", marginBottom: 3, fontFamily: FONT.sans }, { color: t.textPrimary }]}>
-              Titan AI
+              Titan Ai
             </Text>
             <Text style={[{ fontSize: 12, fontFamily: FONT.mono }, { color: t.textMuted }]}>
-              Version 1.0.0 · Built with React Native
+              Version 1.0.0 ·
             </Text>
           </View>
         </ScrollView>
@@ -520,12 +520,18 @@ function ChatWindow({
           <Text style={[{ fontSize: 16, fontWeight: "700", fontFamily: FONT.sans }, { color: t.textPrimary }]}>Titan AI</Text>
         </View>
         <View style={[st.badge, { backgroundColor: t.surface, borderColor: t.border }]}>
-          <Text style={[{ fontSize: 11, fontWeight: "600", fontFamily: FONT.mono }, { color: t.textSecondary }]}>GPT-4</Text>
+          <Text style={[{ fontSize: 11, fontWeight: "600", fontFamily: FONT.mono }, { color: t.textSecondary }]}>GPT-3.5</Text>
         </View>
       </View>
 
       {/* Messages */}
-      <ScrollView ref={scrollRef} style={{ flex: 1 }} contentContainerStyle={st.msgList} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        ref={scrollRef}
+        style={{ flex: 1 }}
+        contentContainerStyle={st.msgList}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         {!chat || chat.messages.length === 0 ? (
           <View style={st.empty}>
             <View style={[st.emptyIcon, { backgroundColor: t.accentGlow, borderColor: t.accentDark }]}>
@@ -547,13 +553,19 @@ function ChatWindow({
             </View>
           </View>
         ) : (
-          chat.messages.map((m, i) => <MessageBubble key={m.id} message={m} />)
+          chat.messages.map((m, i) => (
+            <MessageBubble key={m.id} message={m} fontSize={fs} />
+          ))
         )}
         {isTyping && <TypingDots />}
       </ScrollView>
 
       {/* Input */}
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "padding"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 20}
+        style={{ width: "100%" }}
+      >
         <View style={[st.inputArea, { backgroundColor: t.bg, borderTopColor: t.border }]}>
           <View style={[st.inputRow, { backgroundColor: t.inputBg, borderColor: t.border }]}>
             <TextInput
