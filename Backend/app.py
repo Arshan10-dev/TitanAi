@@ -38,10 +38,8 @@ def chat():
 
         print(result)
 
-        reply = result["choices"][0]["message"]["content"]
-
-        return jsonify({"reply": reply})
-
+        return jsonify(result)
+        
     except Exception as e:
         print("ERROR:", e)
         return jsonify({
