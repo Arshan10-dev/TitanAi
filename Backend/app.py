@@ -30,11 +30,12 @@ def chat():
 
     try:
         reply = result["output"][0]["content"][0]["text"]
+        return jsonify({"reply": reply})
+
     except Exception as e:
         print("ERROR:", e)
-    return jsonify({"reply": str(e)})
+        print(result)
 
-    return jsonify({"reply": reply})
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=3000, debug=True)
+        return jsonify({
+            "reply": f"Error generating response: {str(e)}"
+        })
