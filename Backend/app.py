@@ -31,14 +31,21 @@ def chat():
 
         result = response.json()
 
-        print(result)
+        print("FULL RESPONSE =>", result)
+
+        if "choices" not in result:
+            return jsonify({
+                "reply": str(result)
+            })
 
         reply = result["choices"][0]["message"]["content"]
 
         return jsonify({"reply": reply})
 
     except Exception as e:
-        return jsonify({"reply": f"Error generating response: {str(e)}"})
+        return jsonify({
+            "reply": f"Error generating response: {str(e)}"
+        })
 
 @app.route("/")
 def home():
