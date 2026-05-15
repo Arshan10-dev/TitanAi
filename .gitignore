@@ -1,0 +1,18 @@
+# Backend
+Backend/venv/
+
+# Frontend ignored folders
+Frontend/node_modules/
+Frontend/.expo/
+Frontend/.vscode/
+
+# Build folders
+dist/
+Frontend/dist/
+
+# Env files
+Backend/.env
+.env
+
+# Misc
+.DS_Store

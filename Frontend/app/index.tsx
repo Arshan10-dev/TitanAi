@@ -1,0 +1,1371 @@
+import React, {
+  useState, useEffect, useRef, useCallback,
+  useContext, createContext, useMemo,
+} from "react";
+import {
+  Text, TextInput, TouchableOpacity, ScrollView, Modal, StyleSheet,
+  StatusBar, Animated, Dimensions, Switch, PanResponder,
+} from "react-native";
+import { SafeAreaView } from "react-native";
+import { KeyboardAvoidingView, Platform, View } from "react-native";
+import * as SplashScreen from "expo-splash-screen";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Pressable } from "react-native";
+import { useWindowDimensions } from "react-native";
+import AnimatedSplash from "../components/AnimatedSplash";
+// ─── Types ────────────────────────────────────────────────────────────────────
+interface Message {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  timestamp: Date;
+}
+
+interface Chat {
+  id: string;
+  title: string;
+  messages: Message[];
+  createdAt: Date;
+}
+
+interface SettingsState {
+  darkMode: boolean;
+  streamingEnabled: boolean;
+  soundEnabled: boolean;
+  fontSize: "sm" | "md" | "lg";
+}
+
+// ─── Theme Definition ─────────────────────────────────────────────────────────
+
+interface Theme {
+  bg: string;
+  sidebar: string;
+  surface: string;
+  surfaceHover: string;
+  surfaceActive: string;
+  inputBg: string;
+  border: string;
+  borderLight: string;
+  accent: string;
+  accentDark: string;
+  accentGlow: string;
+  userBubble: string;
+  userBubbleBorder: string;
+  aiBubble: string;
+  textPrimary: string;
+  textSecondary: string;
+  textMuted: string;
+  white: string;
+  statusBar: "light-content" | "dark-content";
+}
+
+const DARK: Theme = {
+  bg: "#212121",
+  sidebar: "#171717",
+  surface: "#2a2a2a",
+  surfaceHover: "#303030",
+  surfaceActive: "#383838",
+  inputBg: "#2f2f2f",
+  border: "#3a3a3a",
+  borderLight: "#454545",
+  accent: "#2f2f2f",
+  accentDark: "#505050",
+  accentGlow: "rgba(65, 77, 74, 0.12)",
+  userBubble: "#2f2f2f",
+  userBubbleBorder: "#484848",
+  aiBubble: "transparent",
+  textPrimary: "#ececec",
+  textSecondary: "#9a9a9a",
+  textMuted: "#555555",
+  white: "#ffffff",
+  statusBar: "light-content",
+};
+
+const LIGHT: Theme = {
+  bg: "#ffffff",
+  sidebar: "#f9f9f9",
+  surface: "#f0f0f0",
+  surfaceHover: "#e9e9e9",
+  surfaceActive: "#e2e2e2",
+  inputBg: "#f4f4f4",
+  border: "#e5e5e5",
+  borderLight: "#d8d8d8",
+  accent: "#2f2f2f",
+  accentDark: "#505050",
+  accentGlow: "rgba(66, 77, 74, 0.1)",
+  userBubble: "#efefef",
+  userBubbleBorder: "#e0e0e0",
+  aiBubble: "transparent",
+  textPrimary: "#1a1a1a",
+  textSecondary: "#555555",
+  textMuted: "#aaaaaa",
+  white: "#ffffff",
+  statusBar: "dark-content",
+};
+
+// ─── Theme Context ─────────────────────────────────────────────────────────────
+
+const ThemeCtx = createContext<Theme>(DARK);
+const useTheme = () => useContext(ThemeCtx);
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const SIDEBAR_W = Math.min(Dimensions.get("window").width * 0.82, 300);
+const FONT = {
+  mono: Platform.OS === "ios" ? "Menlo" : "monospace",
+  sans: Platform.OS === "ios" ? "SF Pro Text" : "sans-serif",
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const uid = () => `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+const fmtTime = (d: Date) => d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+const trunc = (s: string, n: number) => (s.length > n ? s.slice(0, n) + "…" : s);
+
+// ─── TypingDots ───────────────────────────────────────────────────────────────
+
+function TypingDots() {
+  const t = useTheme();
+  const d0 = useRef(new Animated.Value(0)).current;
+  const d1 = useRef(new Animated.Value(0)).current;
+  const d2 = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const anim = (dot: Animated.Value, delay: number) =>
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(delay),
+          Animated.timing(dot, { toValue: 1, duration: 280, useNativeDriver: true }),
+          Animated.timing(dot, { toValue: 0, duration: 280, useNativeDriver: true }),
+          Animated.delay(580 - delay),
+        ])
+      );
+    const a0 = anim(d0, 0);
+    const a1 = anim(d1, 150);
+    const a2 = anim(d2, 300);
+    a0.start(); a1.start(); a2.start();
+    return () => { a0.stop(); a1.stop(); a2.stop(); };
+  }, []);
+
+  return (
+    <View style={{ marginBottom: 16 }}>
+      <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+        <View style={[st.aiAvatar, { backgroundColor: t.accent }]}>
+          <Text style={st.avatarTxt}>✦</Text>
+        </View>
+        <View style={[st.bubble, { backgroundColor: t.surface, borderColor: t.border, paddingVertical: 14, paddingHorizontal: 16 }]}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
+            {[d0, d1, d2].map((dot, i) => (
+              <Animated.View
+                key={i}
+                style={{
+                  width: 6, height: 6, borderRadius: 3, backgroundColor: t.accent,
+                  opacity: dot,
+                  transform: [{ translateY: dot.interpolate({ inputRange: [0, 1], outputRange: [0, -4] }) }],
+                }}
+              />
+            ))}
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+}
+
+// ─── MessageBubble ────────────────────────────────────────────────────────────
+
+const MessageBubble = React.memo(function MessageBubble({
+  message,
+  fontSize,
+}: {
+  message: Message;
+  fontSize: number;
+}) {
+  const t = useTheme();
+  const fade = useRef(new Animated.Value(0)).current;
+  const slide = useRef(new Animated.Value(10)).current;
+  const isUser = message.role === "user";
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 250, delay: 20, useNativeDriver: true }),
+      Animated.timing(slide, { toValue: 0, duration: 250, delay: 20, useNativeDriver: true }),
+    ]).start();
+  }, []);
+
+  return (
+    <Animated.View
+      style={[
+        st.msgRow,
+        isUser ? st.userRow : st.aiRow,
+        { opacity: fade, transform: [{ translateY: slide }] },
+      ]}
+    >
+      {!isUser && (
+        <View style={[st.aiAvatar, { backgroundColor: t.accent }]}>
+          <Text style={st.avatarTxt}>✦</Text>
+        </View>
+      )}
+      <View
+        style={[
+          st.bubble,
+          isUser
+            ? { backgroundColor: t.userBubble, borderColor: t.userBubbleBorder, borderBottomRightRadius: 4 }
+            : { backgroundColor: t.aiBubble, borderColor: "transparent", borderBottomLeftRadius: 4 },
+        ]}
+      >
+        <Text style={[st.bubbleTxt, { color: t.textPrimary, fontSize }]}>{message.content}</Text>
+        <Text style={[st.ts, { color: t.textMuted }]}>{fmtTime(message.timestamp)}</Text>
+      </View>
+      {isUser && (
+        <View style={[st.userAvatar, { backgroundColor: t.accentDark }]}>
+          <Text style={st.avatarTxt}>Y</Text>
+        </View>
+      )}
+    </Animated.View>
+  );
+});
+
+// ─── Settings Panel ───────────────────────────────────────────────────────────
+
+function SettingsPanel({
+  visible,
+  settings,
+  onClose,
+  onUpdate,
+  onClearHistory,
+}: {
+  visible: boolean;
+  settings: SettingsState;
+  onClose: () => void;
+  onUpdate: (s: SettingsState) => void;
+  onClearHistory: () => void;
+}) {
+  const t = useTheme();
+  const slide = useRef(new Animated.Value(400)).current;
+
+  useEffect(() => {
+    Animated.timing(slide, { toValue: visible ? 0 : 400, duration: 290, useNativeDriver: true }).start();
+  }, [visible]);
+
+  const toggle = (key: keyof SettingsState) =>
+    onUpdate({ ...settings, [key]: !(settings[key] as boolean) });
+
+  const rows: { label: string; sub: string; key: keyof SettingsState }[] = [
+    { label: "Dark Mode", sub: "Switch between light and dark theme", key: "darkMode" },
+  ];
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="none"
+      onRequestClose={onClose}
+    >
+      <TouchableOpacity
+        style={[st.backdrop, { backgroundColor: settings.darkMode ? "rgba(0,0,0,0.55)" : "rgba(0,0,0,0.22)" }]}
+        activeOpacity={1}
+        onPress={onClose}
+      />
+      <Animated.View
+        style={[st.settingsPanel, {
+          backgroundColor: t.sidebar, borderLeftColor: t.border, transform: [{ translateX: slide }], paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+          paddingBottom: 20,
+        }]}
+      >
+        <View style={[st.settingsHead, { borderBottomColor: t.border }]}>
+          <Text style={[st.settingsTitle, { color: t.textPrimary }]}>Settings</Text>
+          <TouchableOpacity onPress={onClose} style={{ padding: 6 }}>
+            <Text style={{ color: t.textSecondary, fontSize: 16 }}>✕</Text>
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView style={st.settingsBody} showsVerticalScrollIndicator={false}>
+          <Text style={[st.sectionLabel, { color: t.textMuted }]}>PREFERENCES</Text>
+          {rows.map((row) => (
+            <View key={row.key} style={[st.settingRow, { borderBottomColor: t.border }]}>
+              <View style={{ flex: 1, paddingRight: 12 }}>
+                <Text style={[st.settingLabel, { color: t.textPrimary }]}>{row.label}</Text>
+                <Text style={[st.settingSub, { color: t.textMuted }]}>{row.sub}</Text>
+              </View>
+              <Switch
+                value={settings[row.key] as boolean}
+                onValueChange={() => toggle(row.key)}
+                thumbColor={(settings[row.key] as boolean) ? t.accent : t.textMuted}
+                trackColor={{ false: t.border, true: t.accentDark }}
+                ios_backgroundColor={t.border}
+              />
+            </View>
+          ))}
+
+          <Text style={[st.sectionLabel, { color: t.textMuted, marginTop: 26 }]}>FONT SIZE</Text>
+          <View style={{ flexDirection: "row", gap: 10 }}>
+            {(["sm", "md", "lg"] as const).map((sz) => {
+              const on = settings.fontSize === sz;
+              return (
+                <TouchableOpacity
+                  key={sz}
+                  style={[
+                    st.fszBtn,
+                    { backgroundColor: on ? t.accentGlow : t.surface, borderColor: on ? t.accent : t.border },
+                  ]}
+                  onPress={() => onUpdate({ ...settings, fontSize: sz })}
+                >
+                  <Text style={[st.fszTxt, { color: on ? t.accent : t.textSecondary }]}>{sz.toUpperCase()}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          <Text style={[st.sectionLabel, { color: t.textMuted, marginTop: 26 }]}>
+            STORAGE
+          </Text>
+
+          <TouchableOpacity
+            onPress={onClearHistory}
+            activeOpacity={0.75}
+            style={{
+              backgroundColor: t.surface,
+              borderWidth: 1,
+              borderColor: t.border,
+              borderRadius: 14,
+              paddingVertical: 12,
+              paddingHorizontal: 12,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: 10,
+            }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+
+              {/* Trash Icon */}
+              <View
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: 10,
+                  backgroundColor: "rgba(255,77,79,0.12)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 14,
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#ff4d4f",
+                    fontSize: 16,
+                    fontWeight: "700",
+                  }}
+                >
+                  🗑
+                </Text>
+              </View>
+
+              {/* Text */}
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    color: "#ff4d4f",
+                    fontSize: 15,
+                    fontWeight: "600",
+                    marginBottom: 2,
+                  }}
+                >
+                  Delete Chat History
+                </Text>
+
+                <Text
+                  style={{
+                    color: t.textMuted,
+                    fontSize: 12,
+                  }}
+                >
+                  This will remove all chats permanently.
+                </Text>
+              </View>
+            </View>
+
+            {/* Arrow */}
+            <Text
+              style={{
+                color: t.textSecondary,
+                fontSize: 20,
+                marginLeft: 10,
+              }}
+            >
+              ›
+            </Text>
+          </TouchableOpacity>
+          <Text style={[st.sectionLabel, { color: t.textMuted, marginTop: 26 }]}>ABOUT</Text>
+          <View style={[st.aboutCard, { backgroundColor: t.surface, borderColor: t.border }]}>
+            <Text style={[{ fontSize: 14, fontWeight: "700", marginBottom: 3, fontFamily: FONT.sans }, { color: t.textPrimary }]}>
+              Titan Ai
+            </Text>
+            <Text style={[{ fontSize: 12, fontFamily: FONT.mono }, { color: t.textMuted }]}>
+              Version 1.0.0
+            </Text>
+          </View>
+        </ScrollView>
+      </Animated.View>
+    </Modal>
+  );
+}
+
+// ─── Sidebar ──────────────────────────────────────────────────────────────────
+
+function Sidebar({
+  chats,
+  activeChatId,
+  visible,
+  searchQuery,
+  onSelectChat,
+  onNewChat,
+  onSearchChange,
+  onOpenSettings,
+  onClose,
+  menuChatId,
+  setMenuChatId,
+  renamingChatId,
+  renameText,
+  setRenameText,
+  onRenameChat,
+  onDeleteChat,
+  setRenamingChatId,
+  menuPosition,
+  setMenuPosition,
+  isMobile,
+}: {
+  isMobile: boolean;
+  chats: Chat[];
+  activeChatId: string;
+  visible: boolean;
+  searchQuery: string;
+  onSelectChat: (id: string) => void;
+  onNewChat: () => void;
+  onSearchChange: (q: string) => void;
+  onOpenSettings: () => void;
+  onClose: () => void;
+  menuChatId: string | null;
+  setMenuChatId: (id: string | null) => void;
+  renamingChatId: string | null;
+  renameText: string;
+  setRenameText: (text: string) => void;
+  onRenameChat: (chatId: string, title: string) => void;
+  onDeleteChat: (chatId: string) => void;
+  setRenamingChatId: (id: string | null) => void;
+  menuPosition: { x: number; y: number };
+  setMenuPosition: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
+}) {
+  const t = useTheme();
+  const slide = useRef(new Animated.Value(-SIDEBAR_W)).current;
+  // Ref for the rename input so we can focus it properly
+  const renameInputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    Animated.timing(slide, { toValue: visible ? 0 : -SIDEBAR_W, duration: 260, useNativeDriver: true }).start();
+  }, [visible]);
+
+  // When renamingChatId is set, focus the input after a small delay
+  useEffect(() => {
+    if (renamingChatId) {
+      setTimeout(() => {
+        renameInputRef.current?.focus();
+      }, 100);
+    }
+  }, [renamingChatId]);
+
+  const filtered = chats.filter((c) => c.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  const now = Date.now();
+  const grouped = {
+    Today: filtered.filter((c) => new Date().toDateString() === c.createdAt.toDateString()),
+    "This Week": filtered.filter((c) => { const d = now - c.createdAt.getTime(); return d > 86400000 && d < 604800000; }),
+    Older: filtered.filter((c) => now - c.createdAt.getTime() >= 604800000),
+  };
+
+  return (
+    <>
+      {visible && Dimensions.get("window").width < 768 && (
+        <TouchableOpacity
+          style={[st.backdrop, { backgroundColor: "rgba(0,0,0,0.42)" }]}
+          activeOpacity={1}
+          onPress={onClose}
+        />
+      )}
+      <Animated.View
+
+        style={[
+          st.sidebar,
+          {
+            position: isMobile ? "absolute" : "relative",
+            left: 0,
+            top: 0,
+            bottom: 0,
+            backgroundColor: t.sidebar,
+            borderRightColor: t.border,
+            transform: [{ translateX: slide }],
+          },
+        ]}
+      >
+
+        {/* Logo */}
+        <View style={st.logoRow}>
+          <View style={[st.logoMark, { backgroundColor: t.accent }]}>
+            <Text style={{ color: "#fff", fontSize: 13, fontWeight: "800" }}>✦</Text>
+          </View>
+          <Text style={[st.logoTxt, { color: t.textPrimary }]}></Text>
+        </View>
+
+        {/* New chat */}
+        <TouchableOpacity
+          style={[st.newBtn, { backgroundColor: t.accentGlow, borderColor: t.accentDark }]}
+          onPress={onNewChat}
+          activeOpacity={0.75}
+        >
+          <Text style={[{ fontSize: 18, marginRight: 8, lineHeight: 20 }, { color: t.accent }]}>＋</Text>
+          <Text style={[{ fontSize: 14, fontWeight: "600", fontFamily: FONT.sans }, { color: t.accent }]}>New conversation</Text>
+        </TouchableOpacity>
+
+        {/* Search */}
+        <View style={[st.searchBar, { backgroundColor: t.surface, borderColor: t.border }]}>
+          <Text style={[{ fontSize: 16, marginRight: 8 }, { color: t.textMuted }]}>⌕</Text>
+          <TextInput
+            style={[{ flex: 1, fontSize: 13, padding: 0, fontFamily: FONT.sans }, { color: t.textPrimary }]}
+            placeholder="Search chats..."
+            placeholderTextColor={t.textMuted}
+            value={searchQuery}
+            onChangeText={onSearchChange}
+          />
+        </View>
+
+        {/* Chat list */}
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingRight: 6 }}
+          showsVerticalScrollIndicator={true}
+          persistentScrollbar={true}
+          keyboardShouldPersistTaps="always"
+          removeClippedSubviews={false}
+        >
+          {(Object.keys(grouped) as (keyof typeof grouped)[]).map((group) =>
+            grouped[group].length > 0 ? (
+              <View key={group}>
+                <Text style={[st.groupLabel, { color: t.textMuted }]}>
+                  {group}
+                </Text>
+
+                {grouped[group].map((chat) => {
+                  const active = chat.id === activeChatId;
+                  const isRenaming = renamingChatId === chat.id;
+
+                  return (
+                    <View
+                      key={chat.id}
+                      collapsable={false}
+                      style={[
+                        st.chatRow,
+                        active && { backgroundColor: t.surfaceActive },
+                        {
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          position: "relative",
+                        },
+                      ]}
+                    >
+                      {/* ── FIX: TextInput is OUTSIDE Text now ── */}
+                      {isRenaming ? (
+                        // Rename mode — show input directly, no Text wrapper
+                        <TextInput
+                          ref={renameInputRef}
+                          value={renameText}
+                          onChangeText={setRenameText}
+                          underlineColorAndroid="transparent"
+                          returnKeyType="done"
+                          blurOnSubmit={true}
+                          onSubmitEditing={() => onRenameChat(chat.id, renameText)}
+                          onBlur={() => onRenameChat(chat.id, renameText)}
+                          style={[
+                            st.chatRowTxt,
+                            {
+                              flex: 1,
+                              color: t.textPrimary,
+                              paddingVertical: 4,
+                              paddingHorizontal: 4,
+                              borderWidth: 1,
+                              borderColor: t.accentDark,
+                              borderRadius: 6,
+                              backgroundColor: t.surface,
+                              fontSize: 13.5,
+                              fontFamily: FONT.sans,
+                            },
+                          ]}
+                        />
+                      ) : (
+                        // Normal mode — show chat title
+                        <TouchableOpacity
+                          style={{ flex: 1, flexDirection: "row", alignItems: "center" }}
+                          onPress={() => {
+                            onSelectChat(chat.id);
+                            if (Dimensions.get("window").width < 768) onClose();
+                          }}
+                          activeOpacity={0.7}
+                        >
+                          <Text
+                            style={[
+                              { fontSize: 12, marginRight: 8, opacity: 0.55 },
+                              { color: t.textSecondary },
+                            ]}
+                          >
+                            💬
+                          </Text>
+                          <Text
+                            style={[
+                              st.chatRowTxt,
+                              { color: active ? t.textPrimary : t.textSecondary },
+                              active && { fontWeight: "500" },
+                            ]}
+                            numberOfLines={1}
+                          >
+                            {trunc(chat.title, 28)}
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+
+                      {/* Three-dot menu button — hide when renaming */}
+                      {!isRenaming && (
+                        <TouchableOpacity
+                          onPress={(e: any) => {
+                            const pageX = e.nativeEvent.pageX;
+                            const pageY = e.nativeEvent.pageY;
+                            const screenHeight = Dimensions.get("window").height;
+                            const menuHeight = 130;
+                            const bottomSafeArea = 140;
+                            let finalY = pageY;
+                            if (pageY + menuHeight > screenHeight - bottomSafeArea) {
+                              finalY = pageY - menuHeight;
+                            }
+                            setMenuPosition({ x: pageX - 140, y: finalY });
+                            setRenameText(chat.title);
+                            setMenuChatId(chat.id);
+                          }}
+                          style={{ paddingHorizontal: 6, paddingVertical: 2 }}
+                        >
+                          <Text style={{ color: t.textSecondary, fontSize: 18 }}>⋮</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  );
+                })}
+              </View>
+            ) : null
+          )}
+        </ScrollView>
+
+        {/* Bottom */}
+        <View style={[st.sidebarFoot, { borderTopColor: t.border }]}>
+          <TouchableOpacity style={st.footBtn} onPress={onOpenSettings} activeOpacity={0.7}>
+            <Text style={[{ fontSize: 15, marginRight: 10 }, { color: t.textSecondary }]}>⚙</Text>
+            <Text style={[{ fontSize: 14, fontFamily: FONT.sans }, { color: t.textSecondary }]}>Settings</Text>
+          </TouchableOpacity>
+          <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 4 }}>
+            <View style={[st.profAvatar, { backgroundColor: t.accentDark }]}>
+              <Text style={{ color: "#fff", fontSize: 13, fontWeight: "700" }}>Y</Text>
+            </View>
+            <View>
+              <Text style={[{ fontSize: 13.5, fontWeight: "600", fontFamily: FONT.sans }, { color: t.textPrimary }]}>You</Text>
+              <Text style={[{ fontSize: 11, fontFamily: FONT.sans }, { color: t.textMuted }]}>Free plan</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Context menu (Rename / Delete) */}
+        {menuChatId && (
+          <View
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 9998,
+            }}
+          >
+            <Pressable
+              onPress={() => setMenuChatId(null)}
+              style={StyleSheet.absoluteFillObject}
+            />
+
+            <View
+              style={{
+                position: "absolute",
+                top: menuPosition.y,
+                left: menuPosition.x,
+                width: 118,
+                backgroundColor: t.surface,
+                borderRadius: 14,
+                borderWidth: 1,
+                borderColor: t.border,
+                zIndex: 99999,
+                elevation: 999,
+                paddingVertical: 4,
+              }}
+            >
+              <TouchableOpacity
+                onPress={() => {
+                  const latestChat = chats.find((c) => c.id === menuChatId);
+
+                  if (latestChat) {
+                    setRenamingChatId(latestChat.id);
+                    setRenameText(latestChat.title);
+                  }
+
+                  setMenuChatId(null);
+                }}
+                style={{ paddingVertical: 12, paddingHorizontal: 16 }}
+              >
+                <Text
+                  style={{
+                    color: t.textPrimary,
+                    fontSize: 15,
+                    fontWeight: "500",
+                  }}
+                >
+                  Rename
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => {
+                  if (menuChatId) {
+                    onDeleteChat(menuChatId);
+                  }
+
+                  setMenuChatId(null);
+                }}
+                style={{ paddingVertical: 12, paddingHorizontal: 16 }}
+              >
+                <Text
+                  style={{
+                    color: "#ff4d4f",
+                    fontSize: 15,
+                    fontWeight: "500",
+                  }}
+                >
+                  Delete
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      </Animated.View>
+    </>
+  );
+}
+
+// ─── ChatWindow ───────────────────────────────────────────────────────────────
+
+const ChatWindow = React.memo(function ChatWindow({
+  chat, isTyping, inputText, fontSize, onSendMessage, onInputChange, onMenuPress,
+}: {
+  chat: Chat | null;
+  isTyping: boolean;
+  inputText: string;
+  fontSize: "sm" | "md" | "lg";
+  onSendMessage: (t: string) => void;
+  onInputChange: (t: string) => void;
+  onMenuPress: () => void;
+}) {
+  const t = useTheme();
+  const scrollRef = useRef<ScrollView>(null);
+  const fs = fontSize === "sm" ? 13 : fontSize === "lg" ? 16 : 14.5;
+  const canSend = inputText.trim().length > 0;
+
+  useEffect(() => {
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
+  }, [chat?.messages.length, isTyping]);
+
+  return (
+    // ── FIX: ChatWindow uses flex:1, no KAV here — KAV is at root level
+    <View style={[st.chatWin, { backgroundColor: t.bg }]}>
+      {/* Header */}
+      <View style={[st.chatHead, { backgroundColor: t.bg, borderBottomColor: t.border }]}>
+        <TouchableOpacity style={{ padding: 6, marginRight: 12 }} onPress={onMenuPress} activeOpacity={0.7}>
+          <Text style={[{ fontSize: 18 }, { color: t.textSecondary }]}>☰</Text>
+        </TouchableOpacity>
+        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+          <View style={[st.headLogo, { backgroundColor: t.accent }]}>
+            <Text style={{ color: "#fff", fontSize: 11, fontWeight: "800" }}>✦</Text>
+          </View>
+          <Text style={[{ fontSize: 16, fontWeight: "700", fontFamily: FONT.sans }, { color: t.textPrimary }]}>Titan Ai</Text>
+        </View>
+        <View style={[st.badge, { backgroundColor: t.surface, borderColor: t.border }]}>
+          <Text style={[{ fontSize: 11, fontWeight: "600", fontFamily: FONT.mono }, { color: t.textSecondary }]}>GPT-3.5</Text>
+        </View>
+      </View>
+
+      {/* Messages */}
+      <ScrollView
+        ref={scrollRef}
+        style={{ flex: 1 }}
+        onContentSizeChange={() =>
+          scrollRef.current?.scrollToEnd({ animated: true })
+        }
+        contentContainerStyle={st.msgList}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        removeClippedSubviews={true}
+        scrollEventThrottle={16}
+      >
+        {!chat || chat.messages.length === 0 ? (
+          <View style={st.empty}>
+            <View style={[st.emptyIcon, { backgroundColor: t.accentGlow, borderColor: t.accentDark }]}>
+              <Text style={[{ fontSize: 26 }, { color: t.accent }]}>✦</Text>
+            </View>
+            <Text style={[st.emptyH, { color: t.textPrimary }]}>How can I help you today?</Text>
+            <Text style={[st.emptySub, { color: t.textSecondary }]}>Ask me anything — I'm here to assist.</Text>
+            <View style={st.chips}>
+              {["Explain quantum entanglement", "Write a Java Example", "Plan a trip to Germany", "Summarize a concept"].map((s) => (
+                <TouchableOpacity
+                  key={s}
+                  style={[st.chip, { backgroundColor: t.surface, borderColor: t.borderLight }]}
+                  onPress={() => onSendMessage(s)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[{ fontSize: 13, fontFamily: FONT.sans }, { color: t.textSecondary }]}>{s}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        ) : (
+          chat.messages.map((m) => (
+            <MessageBubble key={m.id} message={m} fontSize={fs} />
+          ))
+        )}
+        {isTyping ? <TypingDots /> : null}
+      </ScrollView>
+
+      {/* ── Input — plain View, NO KeyboardAvoidingView here ── */}
+
+    </View>
+  );
+});
+
+// ─── Root ─────────────────────────────────────────────────────────────────────
+
+export default function App() {
+  useEffect(() => {
+    SplashScreen.preventAutoHideAsync();
+  }, []);
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
+  const isTablet = width >= 768 && width < 1024;
+  const isDesktop = width >= 1024;
+  const [sidebarOpen, setSidebarOpen] = useState(isDesktop);
+  useEffect(() => {
+    setSidebarOpen(isDesktop);
+  }, [isDesktop]);
+  const [menuPosition, setMenuPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [menuChatId, setMenuChatId] = useState<string | null>(null);
+  const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
+  const [renameText, setRenameText] = useState("");
+  const [loaded, setLoaded] = useState(false);
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [activeChatId, setActiveChatId] = useState("");
+  const [inputText, setInputText] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
+  const [settings, setSettings] = useState<SettingsState>({
+    darkMode: true,
+    streamingEnabled: true,
+    soundEnabled: false,
+    fontSize: "md",
+  });
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gesture) => {
+        return Math.abs(gesture.dx) > 20;
+      },
+
+      onPanResponderRelease: (_, gesture) => {
+
+        // Right swipe → open sidebar
+        if (gesture.dx > 80) {
+          setSidebarOpen(true);
+        }
+
+        // Left swipe → close sidebar
+        if (gesture.dx < -80) {
+          setSidebarOpen(false);
+        }
+      },
+    })
+  ).current;
+  const theme = useMemo<Theme>(() => (settings.darkMode ? DARK : LIGHT), [settings.darkMode]);
+  const activeChat = useMemo(
+    () => chats.find((c) => c.id === activeChatId) ?? null,
+    [chats, activeChatId]
+  );
+
+  // Save chats
+  useEffect(() => {
+    if (!loaded) return;
+    const saveChats = async () => {
+      try {
+        await AsyncStorage.setItem("TITAN_CHATS", JSON.stringify(chats));
+      } catch (e) {
+        console.log("Error saving chats:", e);
+      }
+    };
+    saveChats();
+  }, [chats, loaded]);
+
+  // Load chats — FIX: no duplicate creation, no spreading prev
+  useEffect(() => {
+    const loadChats = async () => {
+      try {
+        const stored = await AsyncStorage.getItem("TITAN_CHATS");
+        if (stored) {
+          const parsed = JSON.parse(stored).map((chat: Chat) => ({
+            ...chat,
+            createdAt: new Date(chat.createdAt),
+            messages: chat.messages.map((m: Message) => ({
+              ...m,
+              timestamp: new Date(m.timestamp),
+            })),
+          }));
+          // FIX: set directly, don't spread prev
+          setChats(parsed);
+          if (parsed.length > 0) setActiveChatId(parsed[0].id);
+        } else {
+          const id = uid();
+          setChats([{ id, title: "New conversation", messages: [], createdAt: new Date() }]);
+          setActiveChatId(id);
+        }
+      } catch (e) {
+        console.log("Error loading chats:", e);
+        const id = uid();
+        setChats([{ id, title: "New conversation", messages: [], createdAt: new Date() }]);
+        setActiveChatId(id);
+      } finally {
+        setLoaded(true);
+      }
+    };
+    loadChats();
+  }, []);
+
+  const handleNewChat = useCallback(() => {
+    const id = uid();
+    setChats((p) => [{ id, title: "New conversation", messages: [], createdAt: new Date() }, ...p]);
+    setActiveChatId(id);
+  }, []);
+
+  const handleRenameChat = useCallback((chatId: string, newTitle: string) => {
+    setChats((prev) =>
+      prev.map((chat) =>
+        chat.id === chatId
+          ? { ...chat, title: newTitle.trim() || "New conversation" }
+          : chat
+      )
+    );
+    setRenamingChatId(null);
+    setRenameText("");
+  }, []);
+
+  const handleDeleteChat = useCallback((chatId: string) => {
+    setChats((prev) => {
+      const updated = prev.filter((chat) => chat.id !== chatId);
+      if (activeChatId === chatId && updated.length > 0) {
+        setActiveChatId(updated[0].id);
+      }
+      return updated;
+    });
+  }, [activeChatId]);
+
+  const handleClearHistory = useCallback(async () => {
+    try {
+      await AsyncStorage.removeItem("TITAN_CHATS");
+
+      const id = uid();
+
+      const newChat = {
+        id,
+        title: "New conversation",
+        messages: [],
+        createdAt: new Date(),
+      };
+
+      setChats([newChat]);
+      setActiveChatId(id);
+
+    } catch (e) {
+      console.log("Error clearing chats:", e);
+    }
+  }, []);
+  const handleSend = useCallback(
+    async (text: string) => {
+      if (!text.trim()) return;
+
+      const currentChat = chats.find((c) => c.id === activeChatId);
+      const history = (currentChat?.messages || []).map((m) => ({
+        role: m.role,
+        content: m.content.trim(),
+      }));
+      const fullConversation = [
+        ...history,
+        { role: "user", content: text.trim() },
+      ].filter(
+        (m) =>
+          ["user", "assistant", "system"].includes(m.role) &&
+          typeof m.content === "string" &&
+          m.content.trim().length > 0
+      );
+
+      const msg: Message = { id: uid(), role: "user", content: text, timestamp: new Date() };
+
+      setChats((p) =>
+        p.map((c) =>
+          c.id === activeChatId
+            ? {
+              ...c,
+              title: c.messages.length === 0 ? trunc(text, 32) : c.title,
+              messages: [...c.messages, msg],
+            }
+            : c
+        )
+      );
+
+      setInputText("");
+      setIsTyping(true);
+
+      try {
+        const res = await fetch("https://titanai-backend-krkq.onrender.com/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messages: fullConversation }),
+        });
+        const data = await res.json();
+        const ai: Message = {
+          id: uid(),
+          role: "assistant",
+          content: data.reply || "No response",
+          timestamp: new Date(),
+        };
+        setChats((p) =>
+          p.map((c) =>
+            c.id === activeChatId ? { ...c, messages: [...c.messages, ai] } : c
+          )
+        );
+      } catch (err) {
+        const ai: Message = {
+          id: uid(),
+          role: "assistant",
+          content: "Cannot connect to the server ⚠️",
+          timestamp: new Date(),
+        };
+        setChats((p) =>
+          p.map((c) =>
+            c.id === activeChatId ? { ...c, messages: [...c.messages, ai] } : c
+          )
+        );
+      }
+
+      setIsTyping(false);
+    },
+    [activeChatId, chats]
+  );
+  if (showSplash) {
+    return (
+      <AnimatedSplash
+        onFinish={async () => {
+          setShowSplash(false);
+          await SplashScreen.hideAsync();
+        }}
+      />
+    );
+  }
+  return (
+    <ThemeCtx.Provider value={theme}>
+      <SafeAreaView style={[st.root, { backgroundColor: theme.bg }]}>
+        <StatusBar
+          barStyle={theme.statusBar}
+          backgroundColor={theme.sidebar}
+        />
+
+        <View style={st.layout}>
+          <Sidebar
+            chats={chats}
+            activeChatId={activeChatId}
+            visible={sidebarOpen}
+            isMobile={isMobile}
+            searchQuery={searchQuery}
+            onSelectChat={setActiveChatId}
+            onNewChat={handleNewChat}
+            onSearchChange={setSearchQuery}
+            onOpenSettings={() => setSettingsOpen(true)}
+            onClose={() => setSidebarOpen(false)}
+            menuChatId={menuChatId}
+            setMenuChatId={setMenuChatId}
+            renamingChatId={renamingChatId}
+            renameText={renameText}
+            setRenameText={setRenameText}
+            onRenameChat={handleRenameChat}
+            onDeleteChat={handleDeleteChat}
+            setRenamingChatId={setRenamingChatId}
+            menuPosition={menuPosition}
+            setMenuPosition={setMenuPosition}
+          />
+
+          <View
+            style={{
+              flex: 1,
+            }}
+            {...panResponder.panHandlers}
+          >
+            <ChatWindow
+              chat={activeChat}
+              isTyping={isTyping}
+              inputText={inputText}
+              fontSize={settings.fontSize}
+              onSendMessage={handleSend}
+              onInputChange={setInputText}
+              onMenuPress={() => setSidebarOpen((v) => !v)}
+            />
+
+            {/* FIXED INPUT BAR */}
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : undefined}
+              keyboardVerticalOffset={0}
+            >
+              <View
+                style={[
+                  st.inputArea,
+                  {
+                    backgroundColor: theme.bg,
+                    borderTopColor: theme.border,
+                  },
+                ]}
+              >
+                <View
+                  style={[
+                    st.inputRow,
+                    {
+                      backgroundColor: theme.inputBg,
+                      borderColor: theme.border,
+                    },
+                  ]}
+                >
+                  <TextInput
+                    style={[
+                      st.iinput,
+                      {
+                        color: theme.textPrimary,
+                      },
+                    ]}
+                    underlineColorAndroid="transparent"
+                    textAlignVertical="center"
+                    selectionColor={theme.textPrimary}
+                    cursorColor={theme.textPrimary}
+                    placeholder="Message Titan..."
+                    placeholderTextColor={theme.textMuted}
+                    value={inputText}
+                    onChangeText={setInputText}
+                    multiline
+                    maxLength={2000}
+                    blurOnSubmit={false}
+                    onSubmitEditing={() => {
+                      if (Platform.OS === "web") {
+                        const tx = inputText.trim();
+
+                        if (tx) {
+                          handleSend(tx);
+                        }
+                      }
+                    }}
+                    onKeyPress={(e: any) => {
+                      if (Platform.OS === "web") {
+                        if (
+                          e.nativeEvent.key === "Enter" &&
+                          !e.nativeEvent.shiftKey
+                        ) {
+                          e.preventDefault?.();
+
+                          const tx = inputText.trim();
+
+                          if (tx) {
+                            handleSend(tx);
+                          }
+                        }
+                      }
+                    }}
+                  />
+                  <TouchableOpacity
+                    style={[
+                      st.sendBtn,
+                      {
+                        backgroundColor: inputText.trim()
+                          ? theme.accent
+                          : theme.border,
+                      },
+                    ]}
+                    onPress={() => {
+                      const tx = inputText.trim();
+
+                      if (tx) {
+                        handleSend(tx);
+                      }
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "#fff",
+                        fontSize: 18,
+                        fontWeight: "700",
+                      }}
+                    >
+                      ↑
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <Text
+                  style={[
+                    st.hint,
+                    {
+                      color: theme.textMuted,
+                    },
+                  ]}
+
+                >
+                  Titan can make mistakes. Consider checking important info.
+                </Text>
+              </View>
+            </KeyboardAvoidingView>
+          </View>
+        </View>
+
+        <SettingsPanel
+          visible={settingsOpen}
+          settings={settings}
+          onClose={() => setSettingsOpen(false)}
+          onUpdate={setSettings}
+          onClearHistory={handleClearHistory}
+        />
+      </SafeAreaView>
+    </ThemeCtx.Provider>
+  );
+}
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
+const st = StyleSheet.create({
+  root: { flex: 1 },
+  layout: { flex: 1, flexDirection: "row", position: "relative" },
+
+  sidebar: {
+    width: SIDEBAR_W,
+    borderRightWidth: 1,
+    zIndex: 20,
+    elevation: 8,
+    paddingTop: 14,
+    paddingHorizontal: 12,
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 10,
+  },
+  logoRow: { flexDirection: "row", alignItems: "center", marginBottom: 20, paddingHorizontal: 4 },
+  logoMark: { width: 30, height: 30, borderRadius: 8, alignItems: "center", justifyContent: "center", marginRight: 10 },
+  logoTxt: { fontSize: 18, fontWeight: "700", letterSpacing: 0.4, fontFamily: FONT.sans },
+  newBtn: { flexDirection: "row", alignItems: "center", borderWidth: 1, borderRadius: 10, paddingVertical: 10, paddingHorizontal: 14, marginBottom: 12 },
+  searchBar: { flexDirection: "row", alignItems: "center", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 8, marginBottom: 14, borderWidth: 1 },
+  groupLabel: { fontSize: 10, fontWeight: "700", letterSpacing: 1, marginTop: 14, marginBottom: 5, paddingHorizontal: 4, fontFamily: FONT.sans },
+  chatRow: { overflow: "visible", flexDirection: "row", alignItems: "center", paddingVertical: 9, paddingHorizontal: 10, borderRadius: 8, marginBottom: 2 },
+  chatRowTxt: { flex: 1, fontSize: 13.5, fontFamily: FONT.sans },
+  sidebarFoot: { paddingTop: 12, paddingBottom: 18, borderTopWidth: 1 },
+  footBtn: { flexDirection: "row", alignItems: "center", paddingVertical: 10, paddingHorizontal: 10, borderRadius: 8, marginBottom: 10 },
+  profAvatar: { width: 32, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center", marginRight: 10 },
+
+  chatWin: { flex: 1, zIndex: 1, paddingBottom: 4, },
+  chatHead: { height: 58, flexDirection: "row", alignItems: "center", paddingHorizontal: 16, borderBottomWidth: 1 },
+  headLogo: { width: 26, height: 26, borderRadius: 7, alignItems: "center", justifyContent: "center", marginRight: 8 },
+  badge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1 },
+
+  msgList: { paddingVertical: 20, paddingHorizontal: 16, flexGrow: 1 },
+  msgRow: { marginBottom: 16, flexDirection: "row", alignItems: "flex-end" },
+  userRow: { justifyContent: "flex-end" },
+  aiRow: { justifyContent: "flex-start" },
+  bubble: { maxWidth: Dimensions.get("window").width < 768 ? "82%" : "65%", borderRadius: 16, paddingHorizontal: 14, paddingVertical: 10, borderWidth: 1 },
+  bubbleTxt: { fontSize: 14.5, lineHeight: 22, fontFamily: FONT.sans },
+  ts: { fontSize: 10, marginTop: 5, alignSelf: "flex-end", fontFamily: FONT.mono },
+  aiAvatar: { width: 28, height: 28, borderRadius: 8, alignItems: "center", justifyContent: "center", marginRight: 8, marginBottom: 2 },
+  userAvatar: { width: 28, height: 28, borderRadius: 14, alignItems: "center", justifyContent: "center", marginLeft: 8, marginBottom: 2 },
+  avatarTxt: { color: "#fff", fontSize: 11, fontWeight: "800" },
+
+  empty: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingBottom: 100,
+    paddingHorizontal: 20,
+  },
+  emptyIcon: { width: 64, height: 64, borderRadius: 18, borderWidth: 1, alignItems: "center", justifyContent: "center", marginBottom: 20 },
+  emptyH: { fontSize: 22, fontWeight: "700", marginBottom: 8, textAlign: "center", fontFamily: FONT.sans },
+  emptySub: { fontSize: 14, textAlign: "center", marginBottom: 28, fontFamily: FONT.sans },
+  chips: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center" },
+  chip: { borderWidth: 1, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 8, margin: 4 },
+
+  // FIX: no marginTop:"auto", clean padding
+  inputArea: {
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 8,
+    borderTopWidth: 1,
+  },
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 14,
+    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  iinput: {
+    flex: 1,
+    maxHeight: 120,
+    lineHeight: 22,
+
+    paddingTop: 0,
+    paddingBottom: 0,
+    paddingHorizontal: 0,
+
+    fontFamily: FONT.sans,
+
+    outlineStyle: "none",
+
+    ...(Platform.OS === "web"
+      ? ({
+        outlineWidth: 0,
+      } as any)
+      : {}),
+  },
+  sendBtn: { width: 36, height: 36, borderRadius: 10, alignItems: "center", justifyContent: "center", marginLeft: 8 },
+  hint: { fontSize: 10.5, textAlign: "center", marginTop: 8, fontFamily: FONT.sans },
+
+  settingsPanel: {
+    position: "absolute", top: 0, right: 0, bottom: 0,
+    width: Math.min(Dimensions.get("window").width * 0.85, 340),
+    borderLeftWidth: 1, zIndex: 200,
+  },
+  settingsHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16, borderBottomWidth: 1 },
+  settingsTitle: { fontSize: 18, fontWeight: "700", fontFamily: FONT.sans },
+  settingsBody: { flex: 1, paddingHorizontal: 20, paddingTop: 20 },
+  sectionLabel: { fontSize: 10, fontWeight: "700", letterSpacing: 1.2, marginBottom: 12, fontFamily: FONT.sans },
+  settingRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingVertical: 13, borderBottomWidth: 1 },
+  settingLabel: { fontSize: 14, fontWeight: "500", marginBottom: 2, fontFamily: FONT.sans },
+  settingSub: { fontSize: 12, fontFamily: FONT.sans },
+  fszBtn: { flex: 1, paddingVertical: 10, borderRadius: 8, borderWidth: 1, alignItems: "center" },
+  fszTxt: { fontSize: 12, fontWeight: "700", fontFamily: FONT.mono },
+  aboutCard: { borderRadius: 10, padding: 14, borderWidth: 1 },
+});
