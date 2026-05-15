@@ -15,28 +15,32 @@ def chat():
     user_message = data.get("message")
 
     response = requests.post(
-        "https://api.openai.com/v1/responses",
-        headers={
-            "Authorization": f"Bearer {OPENAI_API_KEY}",
-            "Content-Type": "application/json",
-        },
-        json={
-            "model": "gpt-4.1-mini",
-            "input": user_message
-        }
-    )
+    "https://openrouter.ai/api/v1/chat/completions",
+    headers={
+        "Authorization": f"Bearer {OPENAI_API_KEY}",
+        "Content-Type": "application/json",
+    },
+    json={
+        "model": "openai/gpt-4.1-mini",
+        "messages": [
+            {
+                "role": "user",
+                "content": user_message
+            }
+        ]
+    }
+)
 
     result = response.json()
 
-    print(result)
-
     try:
-        reply = result["output"][0]["content"][0]["text"]
+        reply = result["choices"][0]["message"]["content"]
         return jsonify({"reply": reply})
 
     except Exception as e:
+        print("ERROR:", result)
         return jsonify({
-        "reply": str(result)
+        "reply": f"Error generating response: {str(e)}"
     })
     
 if __name__ == "__main__":
