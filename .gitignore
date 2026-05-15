@@ -13,6 +13,7 @@ Frontend/dist/
 # Env files
 Backend/.env
 .env
+**/.env
 
 # Misc
 .DS_Store
