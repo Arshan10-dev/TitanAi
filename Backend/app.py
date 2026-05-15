@@ -15,7 +15,7 @@ CORS(app)
 def chat():
     try:
         data = request.json
-        user_message = data.get("message")
+        messages = data.get("messages", [])
 
         response = requests.post(
             "https://openrouter.ai/api/v1/chat/completions",
@@ -24,28 +24,25 @@ def chat():
                 "Content-Type": "application/json",
             },
             json={
-                "model": "openai/gpt-4.1-mini",
-                "messages": [
-                    {
-                        "role": "user",
-                        "content": user_message
-                    }
-                ],
-                "max_tokens": 300
-            }
+                "model": "openai/gpt-3.5-turbo",
+                "messages": messages,
+            },
         )
 
         result = response.json()
 
+        print(result)
+
         reply = result["choices"][0]["message"]["content"]
 
         return jsonify({"reply": reply})
-        
+
     except Exception as e:
-        print("ERROR:", e)
-        return jsonify({
-            "reply": f"Error generating response: {str(e)}"
-        })
+        return jsonify({"reply": f"Error generating response: {str(e)}"})
+
+@app.route("/")
+def home():
+    return "Titan AI Backend Running"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=3000)
