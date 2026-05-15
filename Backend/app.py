@@ -30,15 +30,16 @@ def chat():
                         "role": "user",
                         "content": user_message
                     }
-                ]
+                ],
+                "max_tokens": 300
             }
         )
 
         result = response.json()
 
-        print(result)
+        reply = result["choices"][0]["message"]["content"]
 
-        return jsonify(result)
+        return jsonify({"reply": reply})
         
     except Exception as e:
         print("ERROR:", e)
