@@ -4,7 +4,7 @@ import requests
 import os
 from dotenv import load_dotenv
 load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 app = Flask(__name__)
 CORS(app)
@@ -17,7 +17,7 @@ def chat():
     response = requests.post(
     "https://openrouter.ai/api/v1/chat/completions",
     headers={
-        "Authorization": f"Bearer {OPENAI_API_KEY}",
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
     },
     json={
