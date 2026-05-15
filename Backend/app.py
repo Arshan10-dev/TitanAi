@@ -30,8 +30,9 @@ def chat():
 
     try:
         reply = result["output"][0]["content"][0]["text"]
-    except:
-        reply = "Error generating response"
+    except Exception as e:
+        print("ERROR:", e)
+    return jsonify({"reply": str(e)})
 
     return jsonify({"reply": reply})
 
