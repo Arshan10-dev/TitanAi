@@ -116,9 +116,9 @@ const styles = StyleSheet.create({
   },
 
   logoBox: {
-    width: 120,
-    height: 120,
-    borderRadius: 32,
+  width: 90,
+  height: 90,
+  borderRadius: 24,
     backgroundColor: "#111",
     justifyContent: "center",
     alignItems: "center",
@@ -141,23 +141,23 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    marginTop: 28,
+    marginTop: 20,
     color: "#fff",
-    fontSize: 54,
+    fontSize: 38,
     fontWeight: "800",
     letterSpacing: -1,
   },
 
   subtitle: {
-    marginTop: 10,
+    marginTop: 8,
     color: "rgba(255,255,255,0.55)",
-    fontSize: 18,
+    fontSize: 14,
     letterSpacing: 1,
   },
 
   progressBg: {
-    width: 260,
-    height: 4,
+    width: 200,
+    height: 3,
     backgroundColor: "rgba(255,255,255,0.10)",
     borderRadius: 10,
     overflow: "hidden",
