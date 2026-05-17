@@ -1,23 +1,39 @@
 {
   "expo": {
-    "name": "TitanAI",
+    "name": "Titan Ai",
     "slug": "titan-ai",
     "version": "1.0.0",
     "orientation": "portrait",
+
     "icon": "./assets/images/icon.png",
+
+    "scheme": "titanai",
+
     "userInterfaceStyle": "automatic",
+
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#050505"
+    },
+
     "android": {
       "package": "com.titan_69.titanai",
+
+      "softwareKeyboardLayoutMode": "resize",
+
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
+        "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
       }
     },
+
     "web": {
       "build": {
         "output": "web-build"
       }
     },
+
     "extra": {
       "eas": {
         "projectId": "c6f552fd-98f5-4ca0-9c88-841dd82bb46f"
