@@ -11,19 +11,13 @@
 
     "userInterfaceStyle": "automatic",
 
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#050505"
-    },
-
     "android": {
       "package": "com.titan_69.titanai",
 
       "softwareKeyboardLayoutMode": "resize",
 
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#000000"
       }
     },
