@@ -14,12 +14,8 @@
     "android": {
       "package": "com.titan_69.titanai",
 
-      "softwareKeyboardLayoutMode": "resize",
+      "softwareKeyboardLayoutMode": "resize"
 
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#000000"
-      }
     },
 
     "web": {
