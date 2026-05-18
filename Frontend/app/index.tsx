@@ -1090,7 +1090,10 @@ export default function App() {
   return (
     <ThemeCtx.Provider value={theme}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView style={[st.root, { backgroundColor: theme.bg }]}>
+        <SafeAreaView
+          style={[st.root, { backgroundColor: theme.bg }]}
+          edges={['top', 'left', 'right']}
+        >
           <StatusBar
             barStyle={theme.statusBar}
             backgroundColor={theme.sidebar}
@@ -1138,8 +1141,9 @@ export default function App() {
 
               {/* FIXED INPUT BAR */}
               <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === "ios" ? "padding" : undefined}
+                style={{ flex: 0 }}  // flex:1 nahi, warna ChatWindow squeeze hoga
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                keyboardVerticalOffset={Platform.OS === "android" ? StatusBar.currentHeight ?? 0 : 0}
               >
                 <View
                   style={[
