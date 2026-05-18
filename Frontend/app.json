@@ -4,26 +4,22 @@
     "slug": "titan-ai",
     "version": "1.0.0",
     "orientation": "portrait",
-
     "icon": "./assets/images/icon.png",
-
     "scheme": "titanai",
-
     "userInterfaceStyle": "automatic",
-
     "android": {
       "package": "com.titan_69.titanai",
-
-      "softwareKeyboardLayoutMode": "resize"
-
+      "softwareKeyboardLayoutMode": "pan",
+      "windowSoftInputMode": "adjustResize",
+      "splash": {
+        "backgroundColor": "#050505"
+      }
     },
-
     "web": {
       "build": {
         "output": "web-build"
       }
     },
-
     "extra": {
       "eas": {
         "projectId": "c6f552fd-98f5-4ca0-9c88-841dd82bb46f"

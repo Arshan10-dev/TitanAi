@@ -10,7 +10,9 @@ import {
   Keyboard,
   TouchableWithoutFeedback
 } from "react-native";
-import { SafeAreaView } from "react-native";
+import * as SplashScreen from "expo-splash-screen";
+SplashScreen.preventAutoHideAsync();
+import { SafeAreaView } from "react-native-safe-area-context";
 import { KeyboardAvoidingView, Platform, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Pressable } from "react-native";
@@ -856,8 +858,6 @@ const ChatWindow = React.memo(function ChatWindow({
 // ─── Root ─────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  useEffect(() => {
-  }, []);
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const isTablet = width >= 768 && width < 1024;
@@ -1081,6 +1081,7 @@ export default function App() {
     return (
       <AnimatedSplash
         onFinish={async () => {
+          await SplashScreen.hideAsync();
           setShowSplash(false);
         }}
       />
@@ -1137,8 +1138,8 @@ export default function App() {
 
               {/* FIXED INPUT BAR */}
               <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+                style={{ flex: 1 }}
+                behavior={Platform.OS === "ios" ? "padding" : undefined}
               >
                 <View
                   style={[
