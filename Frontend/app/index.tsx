@@ -1141,10 +1141,9 @@ export default function App() {
 
               {/* FIXED INPUT BAR */}
               <KeyboardAvoidingView
-                style={{ flex: 0 }}  // flex:1 nahi, warna ChatWindow squeeze hoga
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                keyboardVerticalOffset={Platform.OS === "android" ? StatusBar.currentHeight ?? 0 : 0}
-              >
+  behavior={Platform.OS === "ios" ? "padding" : undefined}
+  style={{ flex: 0 }}
+>
                 <View
                   style={[
                     st.inputArea,
