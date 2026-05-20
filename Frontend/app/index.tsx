@@ -1126,6 +1126,7 @@ export default function App() {
             <View
               style={{
                 flex: 1,
+                minHeight: 0,
               }}
               {...panResponder.panHandlers}
             >
@@ -1141,9 +1142,8 @@ export default function App() {
 
               {/* FIXED INPUT BAR */}
               <KeyboardAvoidingView
-  behavior={Platform.OS === "ios" ? "padding" : undefined}
-  style={{ flex: 0 }}
->
+                behavior={Platform.OS === "ios" ? "padding" : undefined}
+              >
                 <View
                   style={[
                     st.inputArea,
@@ -1294,7 +1294,7 @@ const st = StyleSheet.create({
   footBtn: { flexDirection: "row", alignItems: "center", paddingVertical: 10, paddingHorizontal: 10, borderRadius: 8, marginBottom: 10 },
   profAvatar: { width: 32, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center", marginRight: 10 },
 
-  chatWin: { flex: 1, zIndex: 1, paddingBottom: 4, },
+  chatWin: { flex: 1, zIndex: 1, paddingBottom: 0, minHeight: 0 },
   chatHead: { height: 58, flexDirection: "row", alignItems: "center", paddingHorizontal: 16, borderBottomWidth: 1 },
   headLogo: { width: 26, height: 26, borderRadius: 7, alignItems: "center", justifyContent: "center", marginRight: 8 },
   badge: { borderRadius: 6, paddingHorizontal: 8, paddingVertical: 3, borderWidth: 1 },
@@ -1329,6 +1329,8 @@ const st = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 8,
     borderTopWidth: 1,
+    flexShrink: 0,   // ADD
+    minHeight: 80,   // ADD
   },
   inputRow: {
     flexDirection: "row",
