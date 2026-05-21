@@ -5,6 +5,8 @@ Backend/venv/
 Frontend/node_modules/
 Frontend/.expo/
 Frontend/.vscode/
+android/
+ios/
 
 # Build folders
 dist/
