@@ -10,7 +10,6 @@
     "android": {
       "package": "com.titan_69.titanai",
       "softwareKeyboardLayoutMode": "resize",
-      "windowSoftInputMode": "adjustResize",
       "splash": {
         "backgroundColor": "#050505"
       }
