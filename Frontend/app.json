@@ -21,7 +21,14 @@
     },
     "extra": {
       "eas": {
-        "projectId": "c6f552fd-98f5-4ca0-9c88-841dd82bb46f"
+        "projectId": "8af3cb37-f0d8-4d15-a893-9973cf996fd5"
+      }
+    },
+    "owner": "titan_69",
+    "ios": {
+      "bundleIdentifier": "com.titan69.titanai",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
       }
     }
   }
