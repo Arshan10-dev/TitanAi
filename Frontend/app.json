@@ -8,8 +8,8 @@
     "scheme": "titanai",
     "userInterfaceStyle": "automatic",
     "splash": {
-        "backgroundColor": "#050505"
-      },
+      "backgroundColor": "#050505"
+    },
     "android": {
       "package": "com.titan_69.titanai",
       "softwareKeyboardLayoutMode": "resize"
@@ -21,8 +21,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "c6f552fd-98f5-4ca0-9c88-841dd82bb46f"
+        "projectId": "c0e7e355-e93e-4bc0-9fbe-4c161a4957d6"
       }
-    }
+    },
+    "owner": "titan_69"
   }
 }
