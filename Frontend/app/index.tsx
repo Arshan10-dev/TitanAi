@@ -1089,178 +1089,146 @@ export default function App() {
   }
   return (
     <ThemeCtx.Provider value={theme}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView
-          style={[st.root, { backgroundColor: theme.bg }]}
-          edges={['top', 'left', 'right']}
-        >
-          <StatusBar
-            barStyle={theme.statusBar}
-            backgroundColor={theme.sidebar}
+      <SafeAreaView
+        style={[st.root, { backgroundColor: theme.bg }]}
+        edges={['top', 'left', 'right']}
+      >
+        <StatusBar
+          barStyle={theme.statusBar}
+          backgroundColor={theme.sidebar}
+        />
+
+        <View style={st.layout}>
+          <Sidebar
+            chats={chats}
+            activeChatId={activeChatId}
+            visible={sidebarOpen}
+            isMobile={isMobile}
+            searchQuery={searchQuery}
+            onSelectChat={setActiveChatId}
+            onNewChat={handleNewChat}
+            onSearchChange={setSearchQuery}
+            onOpenSettings={() => setSettingsOpen(true)}
+            onClose={() => setSidebarOpen(false)}
+            menuChatId={menuChatId}
+            setMenuChatId={setMenuChatId}
+            renamingChatId={renamingChatId}
+            renameText={renameText}
+            setRenameText={setRenameText}
+            onRenameChat={handleRenameChat}
+            onDeleteChat={handleDeleteChat}
+            setRenamingChatId={setRenamingChatId}
+            menuPosition={menuPosition}
+            setMenuPosition={setMenuPosition}
           />
 
-          <View style={st.layout}>
-            <Sidebar
-              chats={chats}
-              activeChatId={activeChatId}
-              visible={sidebarOpen}
-              isMobile={isMobile}
-              searchQuery={searchQuery}
-              onSelectChat={setActiveChatId}
-              onNewChat={handleNewChat}
-              onSearchChange={setSearchQuery}
-              onOpenSettings={() => setSettingsOpen(true)}
-              onClose={() => setSidebarOpen(false)}
-              menuChatId={menuChatId}
-              setMenuChatId={setMenuChatId}
-              renamingChatId={renamingChatId}
-              renameText={renameText}
-              setRenameText={setRenameText}
-              onRenameChat={handleRenameChat}
-              onDeleteChat={handleDeleteChat}
-              setRenamingChatId={setRenamingChatId}
-              menuPosition={menuPosition}
-              setMenuPosition={setMenuPosition}
+          <View
+            style={{
+              flex: 1,
+              minHeight: 0,
+            }}
+            {...panResponder.panHandlers}
+          >
+            <ChatWindow
+              chat={activeChat}
+              isTyping={isTyping}
+              inputText={inputText}
+              fontSize={settings.fontSize}
+              onSendMessage={handleSend}
+              onInputChange={setInputText}
+              onMenuPress={() => setSidebarOpen((v) => !v)}
             />
 
-            <View
-              style={{
-                flex: 1,
-                minHeight: 0,
-              }}
-              {...panResponder.panHandlers}
+            {/* FIXED INPUT BAR */}
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : undefined}
             >
-              <ChatWindow
-                chat={activeChat}
-                isTyping={isTyping}
-                inputText={inputText}
-                fontSize={settings.fontSize}
-                onSendMessage={handleSend}
-                onInputChange={setInputText}
-                onMenuPress={() => setSidebarOpen((v) => !v)}
-              />
-
-              {/* FIXED INPUT BAR */}
-              <KeyboardAvoidingView
-                behavior={Platform.OS === "ios" ? "padding" : undefined}
+              <View
+                style={[
+                  st.inputArea,
+                  {
+                    backgroundColor: theme.bg,
+                    borderTopColor: theme.border,
+                  },
+                ]}
               >
                 <View
                   style={[
-                    st.inputArea,
+                    st.inputRow,
                     {
-                      backgroundColor: theme.bg,
-                      borderTopColor: theme.border,
+                      backgroundColor: theme.inputBg,
+                      borderColor: theme.border,
                     },
                   ]}
                 >
-                  <View
+                  <TextInput
                     style={[
-                      st.inputRow,
+                      st.iinput,
+                      { color: theme.textPrimary }
+                    ]}
+                    value={inputText}
+                    onChangeText={setInputText}
+                    placeholder="Message Titan..."
+                    placeholderTextColor={theme.textMuted}
+                    multiline
+                    blurOnSubmit={false}
+                    autoCorrect={false}
+                    autoCapitalize="none"
+                  />
+                  <TouchableOpacity
+                    style={[
+                      st.sendBtn,
                       {
-                        backgroundColor: theme.inputBg,
-                        borderColor: theme.border,
+                        backgroundColor: inputText.trim()
+                          ? theme.accent
+                          : theme.border,
                       },
                     ]}
+                    onPress={() => {
+                      const tx = inputText.trim();
+
+                      if (tx) {
+                        handleSend(tx);
+                      }
+                    }}
                   >
-                    <TextInput
-                      style={[
-                        st.iinput,
-                        {
-                          color: theme.textPrimary,
-                        },
-                      ]}
-                      underlineColorAndroid="transparent"
-                      textAlignVertical="center"
-                      selectionColor={theme.textPrimary}
-                      cursorColor={theme.textPrimary}
-                      placeholder="Message Titan..."
-                      placeholderTextColor={theme.textMuted}
-                      value={inputText}
-                      onChangeText={setInputText}
-                      multiline
-                      maxLength={2000}
-                      blurOnSubmit={false}
-                      onSubmitEditing={() => {
-                        if (Platform.OS === "web") {
-                          const tx = inputText.trim();
-
-                          if (tx) {
-                            handleSend(tx);
-                          }
-                        }
-                      }}
-                      onKeyPress={(e: any) => {
-                        if (Platform.OS === "web") {
-                          if (
-                            e.nativeEvent.key === "Enter" &&
-                            !e.nativeEvent.shiftKey
-                          ) {
-                            e.preventDefault?.();
-
-                            const tx = inputText.trim();
-
-                            if (tx) {
-                              handleSend(tx);
-                            }
-                          }
-                        }
-                      }}
-                    />
-                    <TouchableOpacity
-                      style={[
-                        st.sendBtn,
-                        {
-                          backgroundColor: inputText.trim()
-                            ? theme.accent
-                            : theme.border,
-                        },
-                      ]}
-                      onPress={() => {
-                        const tx = inputText.trim();
-
-                        if (tx) {
-                          handleSend(tx);
-                        }
+                    <Text
+                      style={{
+                        color: "#fff",
+                        fontSize: 18,
+                        fontWeight: "700",
                       }}
                     >
-                      <Text
-                        style={{
-                          color: "#fff",
-                          fontSize: 18,
-                          fontWeight: "700",
-                        }}
-                      >
-                        ↑
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  <Text
-                    style={[
-                      st.hint,
-                      {
-                        color: theme.textMuted,
-                      },
-                    ]}
-
-                  >
-                    Titan can make mistakes. Consider checking important info.
-                  </Text>
+                      ↑
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-              </KeyboardAvoidingView>
-            </View>
-          </View>
 
-          <SettingsPanel
-            visible={settingsOpen}
-            settings={settings}
-            onClose={() => setSettingsOpen(false)}
-            onUpdate={setSettings}
-            onClearHistory={handleClearHistory}
-          />
-        </SafeAreaView>
-      </TouchableWithoutFeedback>
-    </ThemeCtx.Provider>
+                <Text
+                  style={[
+                    st.hint,
+                    {
+                      color: theme.textMuted,
+                    },
+                  ]}
+
+                >
+                  Titan can make mistakes. Consider checking important info.
+                </Text>
+              </View>
+            </KeyboardAvoidingView>
+          </View>
+        </View>
+
+        <SettingsPanel
+          visible={settingsOpen}
+          settings={settings}
+          onClose={() => setSettingsOpen(false)}
+          onUpdate={setSettings}
+          onClearHistory={handleClearHistory}
+        />
+      </SafeAreaView>
+    </ThemeCtx.Provider >
   );
 }
 
