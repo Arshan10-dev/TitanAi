@@ -7,12 +7,12 @@
     "icon": "./assets/images/icon.png",
     "scheme": "titanai",
     "userInterfaceStyle": "automatic",
+    "splash": {
+        "backgroundColor": "#050505"
+      },
     "android": {
       "package": "com.titan_69.titanai",
-      "softwareKeyboardLayoutMode": "resize",
-      "splash": {
-        "backgroundColor": "#050505"
-      }
+      "softwareKeyboardLayoutMode": "resize"
     },
     "web": {
       "build": {
@@ -21,14 +21,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "8af3cb37-f0d8-4d15-a893-9973cf996fd5"
-      }
-    },
-    "owner": "titan_69",
-    "ios": {
-      "bundleIdentifier": "com.titan69.titanai",
-      "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "projectId": "c6f552fd-98f5-4ca0-9c88-841dd82bb46f"
       }
     }
   }
