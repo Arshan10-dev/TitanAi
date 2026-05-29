@@ -1174,6 +1174,28 @@ export default function App() {
                     blurOnSubmit={false}
                     autoCorrect={false}
                     autoCapitalize="none"
+
+                    onKeyPress={(e) => {
+                      // ONLY FOR WEB/DESKTOP
+                      if (Platform.OS === "web") {
+
+                        const nativeEvent = e.nativeEvent as any;
+
+                        // Enter without Shift = Send
+                        if (
+                          nativeEvent.key === "Enter" &&
+                          !nativeEvent.shiftKey
+                        ) {
+                          e.preventDefault?.();
+
+                          const tx = inputText.trim();
+
+                          if (tx) {
+                            handleSend(tx);
+                          }
+                        }
+                      }
+                    }}
                   />
                   <TouchableOpacity
                     style={[
