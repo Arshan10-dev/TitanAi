@@ -24,6 +24,10 @@
         "projectId": "c0e7e355-e93e-4bc0-9fbe-4c161a4957d6"
       }
     },
-    "owner": "titan_69"
+    "owner": "titan_69",
+    "plugins": [
+      "expo-font",
+      "expo-router"
+    ]
   }
 }
