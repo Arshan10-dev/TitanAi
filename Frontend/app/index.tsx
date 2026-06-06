@@ -249,7 +249,7 @@ function SettingsPanel({
 }) {
   const t = useTheme();
   const slide = useRef(new Animated.Value(400)).current;
-
+  const insets = useSafeAreaInsets();
   useEffect(() => {
     Animated.timing(slide, { toValue: visible ? 0 : 400, duration: 290, useNativeDriver: true }).start();
   }, [visible]);
@@ -275,7 +275,7 @@ function SettingsPanel({
       />
       <Animated.View
         style={[st.settingsPanel, {
-          backgroundColor: t.sidebar, borderLeftColor: t.border, transform: [{ translateX: slide }], paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+          backgroundColor: t.sidebar, borderLeftColor: t.border, transform: [{ translateX: slide }], paddingTop: insets.top,
           paddingBottom: 20,
         }]}
       >
@@ -849,9 +849,6 @@ const ChatWindow = React.memo(function ChatWindow({
         )}
         {isTyping ? <TypingDots /> : null}
       </ScrollView>
-
-      {/* ── Input — plain View, NO KeyboardAvoidingView here ── */}
-
     </View>
   );
 });
@@ -1144,6 +1141,7 @@ export default function App() {
             {/* FIXED INPUT BAR */}
             <KeyboardAvoidingView
               behavior={Platform.OS === "ios" ? "padding" : undefined}
+              keyboardVerticalOffset={0}
             >
               <View
                 style={[
@@ -1151,7 +1149,7 @@ export default function App() {
                   {
                     backgroundColor: theme.bg,
                     borderTopColor: theme.border,
-                    paddingBottom: insets.bottom + 8,
+                    paddingBottom: Math.max(insets.bottom, 8),
                   },
                 ]}
               >
