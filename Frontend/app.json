@@ -8,7 +8,7 @@
     "scheme": "titanai",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "icon":"./assets/images/splashscreen_logo.png",
+      "image":"./assets/images/splashscreen_logo.png",
       "backgroundColor": "#050505"
     },
     "android": {
