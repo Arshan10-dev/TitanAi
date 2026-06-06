@@ -13,6 +13,7 @@ import {
 import * as SplashScreen from "expo-splash-screen";
 SplashScreen.preventAutoHideAsync();
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAvoidingView, Platform, View } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Pressable } from "react-native";
@@ -866,6 +867,7 @@ export default function App() {
   useEffect(() => {
     setSidebarOpen(isDesktop);
   }, [isDesktop]);
+  const insets = useSafeAreaInsets();
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [menuChatId, setMenuChatId] = useState<string | null>(null);
   const [renamingChatId, setRenamingChatId] = useState<string | null>(null);
@@ -1149,6 +1151,7 @@ export default function App() {
                   {
                     backgroundColor: theme.bg,
                     borderTopColor: theme.border,
+                    paddingBottom: insets.bottom + 8,
                   },
                 ]}
               >
