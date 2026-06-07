@@ -280,9 +280,6 @@ function SettingsPanel({
             backgroundColor: t.sidebar,
             borderLeftColor: t.border,
 
-            top: insets.top,
-            bottom: insets.bottom,
-
             transform: [{ translateX: slide }],
           },
         ]}
@@ -1098,7 +1095,7 @@ export default function App() {
     <ThemeCtx.Provider value={theme}>
       <SafeAreaView
         style={{ flex: 1 }}
-        edges={['top','bottom']}
+        edges={['top', 'bottom']}
       >
         <StatusBar
           barStyle={theme.statusBar}
@@ -1137,27 +1134,33 @@ export default function App() {
             {...panResponder.panHandlers}
           >
             <KeyboardAvoidingView
-    style={{ flex: 1 }}
-    behavior={Platform.OS === "ios" ? "padding" : "height"}
-    keyboardVerticalOffset={0}
-  >
-            <ChatWindow
-              chat={activeChat}
-              isTyping={isTyping}
-              inputText={inputText}
-              fontSize={settings.fontSize}
-              onSendMessage={handleSend}
-              onInputChange={setInputText}
-              onMenuPress={() => setSidebarOpen((v) => !v)}
-            />
-
+              style={{ flex: 1 }}
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              keyboardVerticalOffset={0}
+            >
+              <ChatWindow
+                chat={activeChat}
+                isTyping={isTyping}
+                inputText={inputText}
+                fontSize={settings.fontSize}
+                onSendMessage={handleSend}
+                onInputChange={setInputText}
+                onMenuPress={() => setSidebarOpen((v) => !v)}
+              />
+              <SettingsPanel
+                visible={settingsOpen}
+                settings={settings}
+                onClose={() => setSettingsOpen(false)}
+                onUpdate={setSettings}
+                onClearHistory={handleClearHistory}
+              />
               <View
                 style={[
                   st.inputArea,
                   {
                     backgroundColor: theme.bg,
                     borderTopColor: theme.border,
-                    paddingBottom: Math.max(insets.bottom, 8),
+                    paddingBottom: Math.max(insets.bottom, 40)
                   },
                 ]}
               >
@@ -1251,13 +1254,6 @@ export default function App() {
           </View>
         </View>
 
-        <SettingsPanel
-          visible={settingsOpen}
-          settings={settings}
-          onClose={() => setSettingsOpen(false)}
-          onUpdate={setSettings}
-          onClearHistory={handleClearHistory}
-        />
       </SafeAreaView>
     </ThemeCtx.Provider >
   );
