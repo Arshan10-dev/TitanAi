@@ -274,10 +274,18 @@ function SettingsPanel({
         onPress={onClose}
       />
       <Animated.View
-        style={[st.settingsPanel, {
-          backgroundColor: t.sidebar, borderLeftColor: t.border, transform: [{ translateX: slide }], paddingTop: insets.top,
-          paddingBottom: 20,
-        }]}
+        style={[
+          st.settingsPanel,
+          {
+            backgroundColor: t.sidebar,
+            borderLeftColor: t.border,
+
+            top: insets.top,
+            bottom: insets.bottom,
+
+            transform: [{ translateX: slide }],
+          },
+        ]}
       >
         <View style={[st.settingsHead, { borderBottomColor: t.border }]}>
           <Text style={[st.settingsTitle, { color: t.textPrimary }]}>Settings</Text>
@@ -1089,8 +1097,8 @@ export default function App() {
   return (
     <ThemeCtx.Provider value={theme}>
       <SafeAreaView
-        style={[st.root, { backgroundColor: theme.bg }]}
-        edges={['top', 'left', 'right']}
+        style={{ flex: 1 }}
+        edges={['top','bottom']}
       >
         <StatusBar
           barStyle={theme.statusBar}
@@ -1128,6 +1136,11 @@ export default function App() {
             }}
             {...panResponder.panHandlers}
           >
+            <KeyboardAvoidingView
+    style={{ flex: 1 }}
+    behavior={Platform.OS === "ios" ? "padding" : "height"}
+    keyboardVerticalOffset={0}
+  >
             <ChatWindow
               chat={activeChat}
               isTyping={isTyping}
@@ -1138,11 +1151,6 @@ export default function App() {
               onMenuPress={() => setSidebarOpen((v) => !v)}
             />
 
-            {/* FIXED INPUT BAR */}
-            <KeyboardAvoidingView
-              behavior={Platform.OS === "ios" ? "padding" : undefined}
-              keyboardVerticalOffset={0}
-            >
               <View
                 style={[
                   st.inputArea,
