@@ -240,12 +240,14 @@ function SettingsPanel({
   onClose,
   onUpdate,
   onClearHistory,
+  isMobile,
 }: {
   visible: boolean;
   settings: SettingsState;
   onClose: () => void;
   onUpdate: (s: SettingsState) => void;
   onClearHistory: () => void;
+  isMobile: boolean;
 }) {
   const t = useTheme();
   const slide = useRef(new Animated.Value(400)).current;
@@ -277,9 +279,12 @@ function SettingsPanel({
         style={[
           st.settingsPanel,
           {
+            position: isMobile ? "absolute" : "relative",
+            right: 0,
+            top: 0,
+            bottom: 0,
             backgroundColor: t.sidebar,
             borderLeftColor: t.border,
-
             transform: [{ translateX: slide }],
           },
         ]}
@@ -1150,6 +1155,7 @@ export default function App() {
               <SettingsPanel
                 visible={settingsOpen}
                 settings={settings}
+                isMobile={isMobile}
                 onClose={() => setSettingsOpen(false)}
                 onUpdate={setSettings}
                 onClearHistory={handleClearHistory}
