@@ -1160,7 +1160,7 @@ export default function App() {
                   {
                     backgroundColor: theme.bg,
                     borderTopColor: theme.border,
-                    paddingBottom: Math.max(insets.bottom, 40)
+                    paddingBottom: Math.max(insets.bottom, 42)
                   },
                 ]}
               >
