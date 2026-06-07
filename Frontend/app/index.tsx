@@ -279,151 +279,153 @@ function SettingsPanel({
         style={[
           st.settingsPanel,
           {
-            position: isMobile ? "absolute" : "relative",
+            position: "absolute",
             right: 0,
             top: 0,
             bottom: 0,
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom,
             backgroundColor: t.sidebar,
             borderLeftColor: t.border,
             transform: [{ translateX: slide }],
           },
         ]}
       >
-        <View style={[st.settingsHead, { borderBottomColor: t.border }]}>
-          <Text style={[st.settingsTitle, { color: t.textPrimary }]}>Settings</Text>
-          <TouchableOpacity onPress={onClose} style={{ padding: 6 }}>
-            <Text style={{ color: t.textSecondary, fontSize: 16 }}>✕</Text>
-          </TouchableOpacity>
-        </View>
+      <View style={[st.settingsHead, { borderBottomColor: t.border }]}>
+        <Text style={[st.settingsTitle, { color: t.textPrimary }]}>Settings</Text>
+        <TouchableOpacity onPress={onClose} style={{ padding: 6 }}>
+          <Text style={{ color: t.textSecondary, fontSize: 16 }}>✕</Text>
+        </TouchableOpacity>
+      </View>
 
-        <ScrollView style={st.settingsBody} showsVerticalScrollIndicator={false}>
-          <Text style={[st.sectionLabel, { color: t.textMuted }]}>PREFERENCES</Text>
-          {rows.map((row) => (
-            <View key={row.key} style={[st.settingRow, { borderBottomColor: t.border }]}>
-              <View style={{ flex: 1, paddingRight: 12 }}>
-                <Text style={[st.settingLabel, { color: t.textPrimary }]}>{row.label}</Text>
-                <Text style={[st.settingSub, { color: t.textMuted }]}>{row.sub}</Text>
-              </View>
-              <Switch
-                value={settings[row.key] as boolean}
-                onValueChange={() => toggle(row.key)}
-                thumbColor={(settings[row.key] as boolean) ? t.accent : t.textMuted}
-                trackColor={{ false: t.border, true: t.accentDark }}
-                ios_backgroundColor={t.border}
-              />
+      <ScrollView style={st.settingsBody} showsVerticalScrollIndicator={false}>
+        <Text style={[st.sectionLabel, { color: t.textMuted }]}>PREFERENCES</Text>
+        {rows.map((row) => (
+          <View key={row.key} style={[st.settingRow, { borderBottomColor: t.border }]}>
+            <View style={{ flex: 1, paddingRight: 12 }}>
+              <Text style={[st.settingLabel, { color: t.textPrimary }]}>{row.label}</Text>
+              <Text style={[st.settingSub, { color: t.textMuted }]}>{row.sub}</Text>
             </View>
-          ))}
-
-          <Text style={[st.sectionLabel, { color: t.textMuted, marginTop: 26 }]}>FONT SIZE</Text>
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            {(["sm", "md", "lg"] as const).map((sz) => {
-              const on = settings.fontSize === sz;
-              return (
-                <TouchableOpacity
-                  key={sz}
-                  style={[
-                    st.fszBtn,
-                    { backgroundColor: on ? t.accentGlow : t.surface, borderColor: on ? t.accent : t.border },
-                  ]}
-                  onPress={() => onUpdate({ ...settings, fontSize: sz })}
-                >
-                  <Text style={[st.fszTxt, { color: on ? t.accent : t.textSecondary }]}>{sz.toUpperCase()}</Text>
-                </TouchableOpacity>
-              );
-            })}
+            <Switch
+              value={settings[row.key] as boolean}
+              onValueChange={() => toggle(row.key)}
+              thumbColor={(settings[row.key] as boolean) ? t.accent : t.textMuted}
+              trackColor={{ false: t.border, true: t.accentDark }}
+              ios_backgroundColor={t.border}
+            />
           </View>
-          <Text style={[st.sectionLabel, { color: t.textMuted, marginTop: 26 }]}>
-            STORAGE
-          </Text>
+        ))}
 
-          <TouchableOpacity
-            onPress={onClearHistory}
-            activeOpacity={0.75}
-            style={{
-              backgroundColor: t.surface,
-              borderWidth: 1,
-              borderColor: t.border,
-              borderRadius: 14,
-              paddingVertical: 12,
-              paddingHorizontal: 12,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: 10,
-            }}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
-
-              {/* Trash Icon */}
-              <View
-                style={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: 10,
-                  backgroundColor: "rgba(255,77,79,0.12)",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginRight: 14,
-                }}
+        <Text style={[st.sectionLabel, { color: t.textMuted, marginTop: 26 }]}>FONT SIZE</Text>
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          {(["sm", "md", "lg"] as const).map((sz) => {
+            const on = settings.fontSize === sz;
+            return (
+              <TouchableOpacity
+                key={sz}
+                style={[
+                  st.fszBtn,
+                  { backgroundColor: on ? t.accentGlow : t.surface, borderColor: on ? t.accent : t.border },
+                ]}
+                onPress={() => onUpdate({ ...settings, fontSize: sz })}
               >
-                <Text
-                  style={{
-                    color: "#ff4d4f",
-                    fontSize: 16,
-                    fontWeight: "700",
-                  }}
-                >
-                  🗑
-                </Text>
-              </View>
+                <Text style={[st.fszTxt, { color: on ? t.accent : t.textSecondary }]}>{sz.toUpperCase()}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+        <Text style={[st.sectionLabel, { color: t.textMuted, marginTop: 26 }]}>
+          STORAGE
+        </Text>
 
-              {/* Text */}
-              <View style={{ flex: 1 }}>
-                <Text
-                  style={{
-                    color: "#ff4d4f",
-                    fontSize: 15,
-                    fontWeight: "600",
-                    marginBottom: 2,
-                  }}
-                >
-                  Delete Chat History
-                </Text>
+        <TouchableOpacity
+          onPress={onClearHistory}
+          activeOpacity={0.75}
+          style={{
+            backgroundColor: t.surface,
+            borderWidth: 1,
+            borderColor: t.border,
+            borderRadius: 14,
+            paddingVertical: 12,
+            paddingHorizontal: 12,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: 10,
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
 
-                <Text
-                  style={{
-                    color: t.textMuted,
-                    fontSize: 12,
-                  }}
-                >
-                  This will remove all chats permanently.
-                </Text>
-              </View>
-            </View>
-
-            {/* Arrow */}
-            <Text
+            {/* Trash Icon */}
+            <View
               style={{
-                color: t.textSecondary,
-                fontSize: 20,
-                marginLeft: 10,
+                width: 34,
+                height: 34,
+                borderRadius: 10,
+                backgroundColor: "rgba(255,77,79,0.12)",
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: 14,
               }}
             >
-              ›
-            </Text>
-          </TouchableOpacity>
-          <Text style={[st.sectionLabel, { color: t.textMuted, marginTop: 26 }]}>ABOUT</Text>
-          <View style={[st.aboutCard, { backgroundColor: t.surface, borderColor: t.border }]}>
-            <Text style={[{ fontSize: 14, fontWeight: "700", marginBottom: 3, fontFamily: FONT.sans }, { color: t.textPrimary }]}>
-              Titan Ai
-            </Text>
-            <Text style={[{ fontSize: 12, fontFamily: FONT.mono }, { color: t.textMuted }]}>
-              Version 1.0.0
-            </Text>
+              <Text
+                style={{
+                  color: "#ff4d4f",
+                  fontSize: 16,
+                  fontWeight: "700",
+                }}
+              >
+                🗑
+              </Text>
+            </View>
+
+            {/* Text */}
+            <View style={{ flex: 1 }}>
+              <Text
+                style={{
+                  color: "#ff4d4f",
+                  fontSize: 15,
+                  fontWeight: "600",
+                  marginBottom: 2,
+                }}
+              >
+                Delete Chat History
+              </Text>
+
+              <Text
+                style={{
+                  color: t.textMuted,
+                  fontSize: 12,
+                }}
+              >
+                This will remove all chats permanently.
+              </Text>
+            </View>
           </View>
-        </ScrollView>
-      </Animated.View>
-    </Modal>
+
+          {/* Arrow */}
+          <Text
+            style={{
+              color: t.textSecondary,
+              fontSize: 20,
+              marginLeft: 10,
+            }}
+          >
+            ›
+          </Text>
+        </TouchableOpacity>
+        <Text style={[st.sectionLabel, { color: t.textMuted, marginTop: 26 }]}>ABOUT</Text>
+        <View style={[st.aboutCard, { backgroundColor: t.surface, borderColor: t.border }]}>
+          <Text style={[{ fontSize: 14, fontWeight: "700", marginBottom: 3, fontFamily: FONT.sans }, { color: t.textPrimary }]}>
+            Titan Ai
+          </Text>
+          <Text style={[{ fontSize: 12, fontFamily: FONT.mono }, { color: t.textMuted }]}>
+            Version 1.0.0
+          </Text>
+        </View>
+      </ScrollView>
+    </Animated.View>
+    </Modal >
   );
 }
 
@@ -1368,7 +1370,7 @@ const st = StyleSheet.create({
     width: Math.min(Dimensions.get("window").width * 0.85, 340),
     borderLeftWidth: 1, zIndex: 200,
   },
-  settingsHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingTop: 20, paddingBottom: 16, borderBottomWidth: 1 },
+  settingsHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 20, paddingTop: 12, paddingBottom: 12, borderBottomWidth: 1 },
   settingsTitle: { fontSize: 18, fontWeight: "700", fontFamily: FONT.sans },
   settingsBody: { flex: 1, paddingHorizontal: 20, paddingTop: 20 },
   sectionLabel: { fontSize: 10, fontWeight: "700", letterSpacing: 1.2, marginBottom: 12, fontFamily: FONT.sans },
