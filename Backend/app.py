@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 app = Flask(__name__)
 CORS(app)
@@ -20,11 +20,11 @@ def chat():
         response = requests.post(
             "https://openrouter.ai/api/v1/chat/completions",
             headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Authorization": f"Bearer {GEMINI_API_KEY}",
                 "Content-Type": "application/json",
             },
             json={
-                "model": "openai/gpt-3.5-turbo",
+                "model": "gemini/gemini-3-flash",
                 "messages": messages,
             },
         )
