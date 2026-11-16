@@ -23,7 +23,7 @@ def chat():
     try:
         data = request.json or {}
         messages = data.get("messages", [])
-
+        messages = messages[-10:]
         if not messages:
             return jsonify({"reply": "Please enter a message."}), 400
 
@@ -61,7 +61,7 @@ def chat():
             contents=contents,
             config=types.GenerateContentConfig(
                 system_instruction=system_instruction or None,
-                max_output_tokens=300,
+                max_output_tokens=200,
                 temperature=0.7
             )
         )
