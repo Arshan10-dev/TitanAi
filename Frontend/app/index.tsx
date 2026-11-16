@@ -817,7 +817,7 @@ const ChatWindow = React.memo(function ChatWindow({
           <Text style={[{ fontSize: 16, fontWeight: "700", fontFamily: FONT.sans }, { color: t.textPrimary }]}>Titan Ai</Text>
         </View>
         <View style={[st.badge, { backgroundColor: t.surface, borderColor: t.border }]}>
-          <Text style={[{ fontSize: 11, fontWeight: "600", fontFamily: FONT.mono }, { color: t.textSecondary }]}>GPT-3.5</Text>
+          <Text style={[{ fontSize: 11, fontWeight: "600", fontFamily: FONT.mono }, { color: t.textSecondary }]}>Gemini Flash</Text>
         </View>
       </View>
 
@@ -1021,88 +1021,128 @@ export default function App() {
     }
   }, []);
   const handleSend = useCallback(
-    async (text: string) => {
-      if (!text.trim()) return;
+  async (text: string) => {
+    if (!text.trim() || isTyping) return;
 
-      const currentChatId = activeChatId;
+    const currentChatId = activeChatId;
 
-      let history: { role: string; content: string }[] = [];
-      setChats((prev) => {
-        const currentChat = prev.find((c) => c.id === currentChatId);
-        history = (currentChat?.messages || []).map((m) => ({
-          role: m.role,
-          content: m.content.trim(),
-        }));
-        return prev;
-      });
+    const currentChat = chats.find(
+      (c) => c.id === currentChatId
+    );
 
-      const fullConversation = [
-        ...history,
-        { role: "user", content: text.trim() },
-      ].filter(
-        (m) =>
-          ["user", "assistant", "system"].includes(m.role) &&
-          typeof m.content === "string" &&
-          m.content.trim().length > 0
+    const history = (currentChat?.messages || []).map((m) => ({
+      role: m.role,
+      content: m.content.trim(),
+    }));
+
+    const fullConversation = [
+      ...history,
+      { role: "user", content: text.trim() },
+    ];
+
+    const msg: Message = {
+      id: uid(),
+      role: "user",
+      content: text,
+      timestamp: new Date(),
+    };
+
+    setChats((prev) =>
+      prev.map((c) =>
+        c.id === currentChatId
+          ? {
+              ...c,
+              title:
+                c.messages.length === 0
+                  ? trunc(text, 32)
+                  : c.title,
+              messages: [...c.messages, msg],
+            }
+          : c
+      )
+    );
+
+    setInputText("");
+    setIsTyping(true);
+
+    const controller = new AbortController();
+
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, 45000);
+
+    try {
+      const res = await fetch(
+        "https://titanai-backend-krkq.onrender.com/chat",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            messages: fullConversation,
+          }),
+          signal: controller.signal,
+        }
       );
 
-      const msg: Message = {
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(
+          data.reply || `Server error: ${res.status}`
+        );
+      }
+
+      const ai: Message = {
         id: uid(),
-        role: "user",
-        content: text,
+        role: "assistant",
+        content: data.reply || "No response received.",
         timestamp: new Date(),
       };
 
-      setChats((p) =>
-        p.map((c) =>
+      setChats((prev) =>
+        prev.map((c) =>
           c.id === currentChatId
             ? {
-              ...c,
-              title: c.messages.length === 0 ? trunc(text, 32) : c.title,
-              messages: [...c.messages, msg],
-            }
+                ...c,
+                messages: [...c.messages, ai],
+              }
             : c
         )
       );
 
-      setInputText("");
-      setIsTyping(true);
+    } catch (err: any) {
+      const errorMessage = err.name === "AbortError"
+        ? "Request timed out. Please try again."
+        : err.message || "Cannot connect to server.";
 
-      try {
-        const res = await fetch("https://titanai-backend-krkq.onrender.com/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: fullConversation }),
-        });
-        const data = await res.json();
-        const ai: Message = {
-          id: uid(),
-          role: "assistant",
-          content: data.reply || "No response",
-          timestamp: new Date(),
-        };
-        setChats((p) =>
-          p.map((c) =>
-            c.id === currentChatId ? { ...c, messages: [...c.messages, ai] } : c
-          )
-        );
-      } catch (err) {
-        const ai: Message = {
-          id: uid(),
-          role: "assistant",
-          content: "Cannot connect to the server ⚠️",
-          timestamp: new Date(),
-        };
-        setChats((p) =>
-          p.map((c) =>
-            c.id === currentChatId ? { ...c, messages: [...c.messages, ai] } : c
-          )
-        );
-      }
+      const ai: Message = {
+        id: uid(),
+        role: "assistant",
+        content: errorMessage,
+        timestamp: new Date(),
+      };
 
+      setChats((prev) =>
+        prev.map((c) =>
+          c.id === currentChatId
+            ? {
+                ...c,
+                messages: [...c.messages, ai],
+              }
+            : c
+        )
+      );
+
+      console.error("Titan AI Error:", err);
+
+    } finally {
+      clearTimeout(timeout);
       setIsTyping(false);
-    },
-    [activeChatId]
+    }
+  },
+  [activeChatId, chats, isTyping]
   );
   if (showSplash) {
     return (
