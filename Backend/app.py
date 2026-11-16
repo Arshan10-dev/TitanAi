@@ -24,8 +24,9 @@ def chat():
                 "Content-Type": "application/json",
             },
             json={
-                "model": "gpt-4",
+                "model": "gpt-3.5",
                 "messages": messages,
+                "max_tokens": 400
             },
         )
 
