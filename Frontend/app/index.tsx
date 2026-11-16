@@ -1069,7 +1069,7 @@ export default function App() {
 
     const timeout = setTimeout(() => {
       controller.abort();
-    }, 45000);
+    }, 90000);
 
     try {
       const res = await fetch(
