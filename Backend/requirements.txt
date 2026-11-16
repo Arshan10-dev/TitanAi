@@ -1,6 +1,6 @@
-openai
 flask
 flask-cors
 gunicorn
 requests
 python-dotenv
+google-genai
